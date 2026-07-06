@@ -3,9 +3,10 @@
     import minimize from "$lib/assets/iconkit/minimize.svg";
     import config from "$lib/assets/iconkit/config.svg";
     import tray from "$lib/assets/iconkit/tray.svg";
-    import placeholder from "$lib/assets/placeholder.png";
     import Switch from "./component/generic/switch.svelte";
     import IconButton from "./component/generic/icon_button.svelte";
+    import ManagedGameState from "./component/managed_game_state.svelte";
+    import NoSsr from "./component/generic/no_ssr.svelte";
 
     var self: HTMLElement;
 
@@ -59,6 +60,8 @@
         if (darktheme) self.classList.add("dark");
         else self.classList.remove("dark");
     });
+
+    
 </script>
 
 <main id="game" bind:this={self}>
@@ -86,9 +89,9 @@
         {/if}
     </header>
     <article id="gamelayers">
-        <div id="cardspace">
-            <img src={placeholder} alt="placeholder" />
-        </div>
+        <NoSsr>
+            <ManagedGameState/>
+        </NoSsr>
         <div id="config" hidden={!configRaised}>
             <div>
                 <header>
@@ -175,7 +178,7 @@
             min-height: 128px;
             height: 100%;
 
-            > * {
+            >:global(*) {
                 grid-column: 1;
                 grid-row: 1;
             }

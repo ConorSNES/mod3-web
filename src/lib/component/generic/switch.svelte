@@ -7,7 +7,7 @@
     let { value = $bindable(false), fill = false }: { value: boolean, fill?: boolean} = $props();
 </script>
 
-<button onclick={() => (value = !value)} class={fill ? "fill" : "fill"}>
+<button onclick={() => (value = !value)} class={fill ? "fill" : "fill"} role="switch" aria-checked={value}>
     {#if value}
         <img src={switch_on} alt="ON" height="24" />
     {:else}

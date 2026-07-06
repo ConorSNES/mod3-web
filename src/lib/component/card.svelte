@@ -3,36 +3,46 @@
     import card_to_image from "$lib/card_to_image";
     import delay from "$lib/delay";
 
-    let { card, cangrab = true } : { card : Card, cangrab?: boolean } = $props();
+    let {
+        card,
+        allowgrab = true,
+        ongrab = () => {},
+        onrelease = () => {}
+    }: { card: Card; allowgrab?: boolean; ongrab?: (v: Card) => void, onrelease?: (v: Card) => void } = $props();
 
     let image = $derived(card_to_image(card));
 
-    let self : HTMLDivElement;
+    let self: HTMLDivElement;
 
-    function grab(event : MouseEvent) {
+    function grab(event: MouseEvent) {
         follow(event);
         self.classList.add("grabbed");
         document.addEventListener("mouseup", release);
         document.addEventListener("mousemove", follow);
         document.body.addEventListener("mouseleave", release);
         delay(10, () => self.classList.add("grabmotion"));
+        ongrab(card);
     }
 
     function release() {
-        self.style.transform = "";
-        self.classList.remove("grabbed");
         document.removeEventListener("mouseup", release);
         document.removeEventListener("mousemove", follow);
         document.body.removeEventListener("mouseleave", release);
-        self.classList.remove("grabmotion")
+
+        if (!self) return;
+        self.style.transform = "";
+        self.classList.remove("grabbed");
+        
+        self.classList.remove("grabmotion");
+        onrelease(card);
     }
 
     // use function pointer switch to manage grability
-    let dograb = $derived(cangrab ? grab : () => {});
-    let grabclass = $derived(cangrab ? "cangrab" : "");
+    let dograb = $derived(allowgrab ? grab : () => {});
+    let grabclass = $derived(allowgrab ? "cangrab" : "");
 
-    function follow(event : MouseEvent) {
-        self.style.transform = `translateY(${event.clientY-77}px) translateX(${event.clientX-52}px)`;
+    function follow(event: MouseEvent) {
+        self.style.transform = `translateY(${event.clientY - 77}px) translateX(${event.clientX - 52}px)`;
     }
 
     const height = 154;
@@ -40,9 +50,8 @@
 </script>
 
 <div bind:this={self} onmousedown={dograb} role="none" class={grabclass}>
-    <img src={image} alt={card.to_text()} height={height} width={width}/>
+    <img src={image} alt={card.to_text()} {height} {width} />
 </div>
-
 
 <style>
     div {
@@ -52,10 +61,14 @@
         padding: 0;
         margin: 0;
 
+        background: white;
+
         user-select: none;
         -webkit-user-select: none;
 
-        >* {
+        text-align: center;
+
+        > * {
             pointer-events: none;
         }
 
@@ -70,14 +83,22 @@
                 top: 0;
                 left: 0;
                 z-index: 100;
+                margin: 0;
+
+                pointer-events: none;
 
                 transition: box-shadow 200ms ease-out;
                 box-shadow: 0px 6px 5px #00000065;
             }
 
             &:global(.grabmotion) {
-                transition: transform 100ms ease-out, box-shadow 200ms ease-out;
+                transition:
+                    transform 100ms cubic-bezier(0.25, 1, 0.5, 1),
+                    box-shadow 200ms ease-out;
             }
+
+            /* &:hover>img {
+            } */
         }
     }
 </style>
