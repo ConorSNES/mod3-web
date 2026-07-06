@@ -1,5 +1,5 @@
 /*
-Definition of the actual game state.
+Definition of the actual game state and logic.
 */
 
 import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
@@ -60,10 +60,12 @@ export default class GameState {
         }
     }
 
+    public onMut : () => void = () => {};
+
     /// Fisher-Yates shuffle algorithm. (https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
     /// There's no quick prng support, so a library is linked in to avoid browser weirdness (and actually allow seeding).
     /// This also (should ideally) avoid implementing algorithms in js!
-    private fisher_yates<T>(value: T[], prng: number): T[] {
+    private static fisher_yates<T>(value: T[], prng: number): T[] {
         const random = xoroshiro128plus(prng);
         const o = value;
         for (let i = 0; i < o.length; i++) {
@@ -74,30 +76,47 @@ export default class GameState {
 
     private constructor(seed?: number) {
         this.seed = seed ?? Date.now();
-        this.stackstate["special"]["deck"] = this.fisher_yates(card_deck().concat(card_deck()), this.seed);
+        this.stackstate["special"]["deck"] = GameState.fisher_yates(card_deck().concat(card_deck()), this.seed);
+    }
+
+    private coord_validate(coord: StackState_Coord): void | never {
+        // syntax check
+        if (!(coord.v in this.stackstate)) throw `Bad coord syntax: v "${coord.v}" does not exist!\n(${coord.v}.${coord.w})`;
+        if (!(coord.w in this.stackstate[coord.v])) throw `Bad coord syntax: w "${coord.w}" (within "${coord.v}") does not exist!\n(${coord.v}.${coord.w})`;
+    }
+
+    // convenience functions
+    private peek(stack: StackState_Coord): Card | undefined {
+        return this.stackstate[stack.v][stack.w].at(-1);
+    }
+
+    private peek_len(stack: StackState_Coord): number {
+        return this.stackstate[stack.v][stack.w].length;
     }
 
     public transact(from: StackState_Coord, to: StackState_Coord) {
-        this.transact_raw(from.v, from.w, to.v, to.w)
+        this.transact_raw(from.v, from.w, to.v, to.w);
+        this.automation();
     }
 
     private transact_raw(from_v: string, from_w: string, to_v: string, to_w: string) {
         // syntax check
         if (!(from_v in this.stackstate)) throw `Bad transfer syntax: transferring from v "${from_v}" cannot occur!\n(from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
         if (!(to_v in this.stackstate)) throw `Bad transfer syntax: transferring to v "${to_v}" cannot occur!\n(from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
-        if (!(from_w in this.stackstate[from_v])) throw `Bad transfer syntax: transferring from w "${from_w}" (within ${from_v}) cannot occur!\n(from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
-        if (!(to_w in this.stackstate[to_v])) throw `Bad transfer syntax: transferring to w "${to_w}" (within ${to_v}) cannot occur!\n(from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
+        if (!(from_w in this.stackstate[from_v])) throw `Bad transfer syntax: transferring from w "${from_w}" (within "${from_v}") cannot occur!\n(from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
+        if (!(to_w in this.stackstate[to_v])) throw `Bad transfer syntax: transferring to w "${to_w}" (within "${to_v}") cannot occur!\n(from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
 
         // This can be expanded later to allow the UI to hook into these events.
         const intermediary = this.stackstate[from_v][from_w].pop();
         if (!intermediary) throw `No card in origin stack! (from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
         this.stackstate[to_v][to_w].push(intermediary);
+        this.onMut();
     }
 
     private automation() {
         // All aces are moved to ace stack.
-        ["ones", "twos", "threes", "random"].forEach(row=>{
-            ["0", "1", "2", "3", "4", "5", "6", "7"].forEach(col=>{
+        ["ones", "twos", "threes", "random"].forEach(row => {
+            ["0", "1", "2", "3", "4", "5", "6", "7"].forEach(col => {
                 while (this.stackstate[row][col].at(-1)?.value == 1) {
                     this.transact_raw(row, col, "special", "aces");
                 }
@@ -105,7 +124,7 @@ export default class GameState {
         });
 
         // Empty stacks on "random" row will be refilled from deck.
-        ["0", "1", "2", "3", "4", "5", "6", "7"].forEach(col=>{
+        ["0", "1", "2", "3", "4", "5", "6", "7"].forEach(col => {
             // repeat until "random" has a single card or the deck is dry
             while (
                 this.stackstate["random"][col].length == 0 &&
@@ -135,7 +154,7 @@ export default class GameState {
     public deal_once() {
         // Deal one card to randoms.
         // tack to (https://stackoverflow.com/questions/2641347/short-circuit-array-foreach-like-calling-break) for showing loop breakage method
-        ["0", "1", "2", "3", "4", "5", "6", "7"].some(col=>{
+        ["0", "1", "2", "3", "4", "5", "6", "7"].some(col => {
             if (this.stackstate["special"]["deck"].length <= 0) return true;
             this.transact_raw("special", "deck", "random", col);
         });
@@ -148,6 +167,10 @@ export default class GameState {
         const o = new GameState(seed);
         o.initial_deal();
         return o;
+    }
+
+    public get_deck_count(): number {
+        return this.stackstate["special"]["deck"].length;
     }
 
     /// Collect (hopefully const) row of stacks.
@@ -168,5 +191,83 @@ export default class GameState {
     /// Collect current array of aces.
     public get_aces(): readonly Card[] {
         return this.stackstate["special"]["aces"];
+    }
+
+    /// Collect current grab logic for stack (if the player is allowed to pick up the card here).
+    public get_grab_logic(coord: StackState_Coord): boolean {
+        this.coord_validate(coord);
+
+        const peek = this.peek(coord);
+        const peek_len = this.peek_len(coord);
+        switch (coord.v) {
+            case "ones":
+                return (peek && !(peek.value == (peek_len * 3)+1)) ?? false;
+            case "twos":
+                return (peek && !(peek.value == (peek_len * 3)-1)) ?? false;
+            case "threes":
+                return (peek && !(peek.value == (peek_len * 3))) ?? false;
+            case "random":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// Collect current drop logic for stack (if the player is allowed to drop "grab" here).
+    public get_drop_logic(coord: StackState_Coord, grab?: Card): boolean {
+        if (!grab) return false;
+
+        this.coord_validate(coord);
+
+        const peek = this.peek(coord);
+        const cangrab = this.get_grab_logic(coord);
+        const mod = grab.value % 3;
+        const greater = peek && (~~(grab.value / 3) == (~~(peek.value / 3) + 1));
+        switch (coord.v) {
+            case "ones":
+                return (greater == undefined) 
+                    ? (grab.value == 4) 
+                    : (!cangrab && mod == 1 && greater && grab.suit == peek.suit);
+            case "twos":
+                return (greater == undefined) 
+                    ? (grab.value == 2) 
+                    : (!cangrab && mod == 2 && greater && grab.suit == peek.suit);
+            case "threes":
+                return (greater == undefined) 
+                    ? (grab.value == 3) 
+                    : (!cangrab && mod == 0 && greater && grab.suit == peek.suit);
+            case "random":
+                // empty random cells can be dropped into
+                return peek == undefined;
+            default:
+                return false;
+        }
+    }
+
+    public to_string() : string {
+        let o = "game:\n";
+        ["twos", "threes", "ones", "random"].forEach(row => {
+            ["0", "1", "2", "3", "4", "5", "6", "7"].forEach(col => {
+                if (this.stackstate[row][col].length > 0) {
+                    this.stackstate[row][col].forEach(card=>{
+                        o+=card.to_chars()+"&";
+                    });
+                    o=o.substring(0,o.length-1);
+                    o+=" ";
+                }
+                else o += "[] ";
+            });
+            o += "\n";
+        }); 
+        o += "aces: ";
+        if (this.stackstate["special"]["aces"].length > 0) {
+            this.stackstate["special"]["aces"].forEach(card=>{
+                o+=card.to_chars()+"&";
+            });
+            o=o.substring(0,o.length-1);
+            o+=" ";
+        }
+        else o += "[] ";
+        return o;
     }
 }

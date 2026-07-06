@@ -3,17 +3,18 @@
         onclick = () => {},
         width = 32,
         height = 32,
-        src, alt
+        src, alt, title
     } : { 
         onclick? : (m : MouseEvent) => void,
         width? : number,
         height? : number,
         src : string,
-        alt : string
+        alt : string,
+        title?: string
     } = $props();
 </script>
 
-<button onclick={onclick}>
+<button onclick={onclick} title={title}>
     <img src={src} alt={alt} width={width} height={height} />
 </button>
 

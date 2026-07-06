@@ -1,17 +1,11 @@
 <script lang="ts">
+    import { height, width } from "$lib/cardscale";
     import type { Snippet } from "svelte";
-    import position from "$lib/assets/deck/position.png";
 
     let { children, allowdrop = false, ondrop = ()=>{} } : { children? : Snippet, allowdrop?: boolean, ondrop? : ()=>void } = $props();
-
-    const height = 154;
-    const width = 104;
-    var card_dist = $state(30);
-    const card_spacing = $derived(-height+card_dist);
 </script>
 
-<div class="stack" style="--card-spacing: {card_spacing}px; --width: {width}px; --height: {height}px">
-    <img src={position} alt="card stack"/>
+<div class="stack" style="--width: {width}px; --height: {height}px;">
     {@render children?.()}
     <div class="topbox {allowdrop ? "" : "hide"}" onmouseup={allowdrop ? ondrop : ()=>{}} role="none"></div>
 </div>
@@ -21,25 +15,22 @@
         display: flex;
         flex-direction: column;
         width: var(--width);
+        height: 100%;
+        justify-content: space-between;
+        align-items: start;
+
+        background: url("$lib/assets/deck/position.png");
+        background-repeat: no-repeat;
+        background-size: var(--width) var(--height);
 
         &>:global(*) {
             /* this doesn't work right with card dnd */
             /* transition: margin-top 200ms ease-out;  */
 
-            margin-top: var(--card-spacing);
-
+            margin-top: calc(var(--height) * -1);
             &:first-child {
-                box-sizing: border-box;
                 margin-top: 0;
-                margin-bottom: calc((var(--card-spacing) + var(--height)) * -1);
             }
-        }
-
-        >img {
-            /* try to override user select to stop this sprite from messing up browsers */
-            user-select: none;
-            -webkit-user-select: none;
-            pointer-events: none;
         }
 
         >.topbox {
@@ -63,5 +54,10 @@
                 visibility: hidden;
             }
         }
+
+        /* Peeking function. unused */
+        /* &.peek>:global(:hover&:not(img, .topbox)) {
+            margin-bottom: 40px;
+        } */
     }
 </style>

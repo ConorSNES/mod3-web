@@ -1,6 +1,7 @@
 <script lang="ts">
     import type Card from "$lib/card";
     import card_to_image from "$lib/card_to_image";
+    import { height, width } from "$lib/cardscale";
     import delay from "$lib/delay";
 
     let {
@@ -15,6 +16,8 @@
     let self: HTMLDivElement;
 
     function grab(event: MouseEvent) {
+        if (event.shiftKey) return;
+
         follow(event);
         self.classList.add("grabbed");
         document.addEventListener("mouseup", release);
@@ -42,11 +45,8 @@
     let grabclass = $derived(allowgrab ? "cangrab" : "");
 
     function follow(event: MouseEvent) {
-        self.style.transform = `translateY(${event.clientY - 77}px) translateX(${event.clientX - 52}px)`;
+        self.style.transform = `translateY(${event.clientY - (height / 2.0)}px) translateX(${event.clientX - (width / 2.0)}px)`;
     }
-
-    const height = 154;
-    const width = 104;
 </script>
 
 <div bind:this={self} onmousedown={dograb} role="none" class={grabclass}>
@@ -75,7 +75,7 @@
         /* this stylecode is only relevant when a card can be grabbed */
         &.cangrab {
             cursor: grab;
-            box-shadow: 0px 0px 5px #00000065;
+            /* box-shadow: 0px 0px 5px #00000065; */
 
             &:global(.grabbed) {
                 cursor: grabbing;
@@ -99,6 +99,10 @@
 
             /* &:hover>img {
             } */
+        }
+
+        &:not(.cangrab) {
+            cursor: not-allowed;
         }
     }
 </style>

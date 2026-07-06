@@ -41,6 +41,28 @@ export default class Card {
     public to_text() : string {
         return `${this.value_to_text()} of ${this.suit_to_text()}s`
     }
+
+    public to_chars() : string {
+        const s = ((suit : Suit)=>{
+            switch (suit) {
+                case Suit.Spade: return '♠';
+                case Suit.Heart: return '♡';
+                case Suit.Diamond: return '♢';
+                case Suit.Club: return '♣';
+            }
+        })(this.suit);
+        const v = ((value : number)=>{
+            switch (value) {
+                case 1: return '1';
+                case 10: return '0';
+                case 11: return 'j';
+                case 12: return 'k';
+                case 13: return 'q';
+                default: return value.toString();
+            }
+        })(this.value);
+        return `${s}${v}`;
+    }
 }
 
 export enum Suit {

@@ -3,10 +3,14 @@
     import minimize from "$lib/assets/iconkit/minimize.svg";
     import config from "$lib/assets/iconkit/config.svg";
     import tray from "$lib/assets/iconkit/tray.svg";
+    import create_new from "$lib/assets/iconkit/create_new.svg";
     import Switch from "./component/generic/switch.svelte";
     import IconButton from "./component/generic/icon_button.svelte";
     import ManagedGameState from "./component/managed_game_state.svelte";
     import NoSsr from "./component/generic/no_ssr.svelte";
+    import GameState from "./gamestate";
+    import { BrowserStored } from "./browser-stored";
+    import { onMount } from "svelte";
 
     var self: HTMLElement;
 
@@ -55,43 +59,64 @@
 
     // manage dark theme
 
-    let darktheme: boolean = $state(false);
+    let meta_darktheme = new BrowserStored("darktheme", false, (v) => v ? v === "true" : null);
+    let darktheme: boolean = $state(meta_darktheme.default_val);
+    onMount(() => {darktheme = meta_darktheme.value});
     $effect(() => {
+        meta_darktheme.value = darktheme;
+
         if (darktheme) self.classList.add("dark");
         else self.classList.remove("dark");
     });
 
-    
+    // manage game state
+    let gamestate: GameState = $state(GameState.quick_start());
+
+    function new_game() {
+        gamestate = GameState.quick_start();
+    }
 </script>
 
 <main id="game" bind:this={self}>
     <header>
         <span class="headerfill">placeholder</span>
 
+        <IconButton 
+            src={create_new}
+            alt="new game"
+            title="Start a new game"
+            onclick={new_game}
+        />
+
         <IconButton
             src={config}
-            alt="open config"
+            alt="config"
+            title="Configure game options"
             onclick={() => (configRaised = !configRaised)}
         />
 
         {#if displayState == 0}
             <IconButton
                 src={maximize}
-                alt="maximise game"
+                alt="maximise"
+                title="Maximise this game view (+shift for fullscreen)"
                 onclick={(e) => (displayState = e.shiftKey ? 2 : 1)}
             />
         {:else}
             <IconButton
                 src={minimize}
-                alt="minimise game"
+                alt="minimise"
+                title="Return game view to normal"
                 onclick={() => (displayState = 0)}
             />
         {/if}
     </header>
     <article id="gamelayers">
-        <NoSsr>
-            <ManagedGameState/>
-        </NoSsr>
+        <div class="panicgamebox">
+            <NoSsr>
+                <ManagedGameState bind:gamestate/>
+            </NoSsr>
+        </div>
         <div id="config" hidden={!configRaised}>
             <div>
                 <header>
@@ -182,6 +207,17 @@
                 grid-column: 1;
                 grid-row: 1;
             }
+
+            >.panicgamebox {
+                display: flex;
+                place-content: center;
+                place-items: center;
+
+                overflow: auto;
+
+                width: 100%;
+                height: 100%;
+            }
         }
 
         #config {
@@ -193,7 +229,8 @@
             box-sizing: border-box;
             width: 100%;
             height: 100%;
-            background-image: url("./assets/dither.png");
+            background: #00000080;
+            backdrop-filter: blur(4px);
 
             > * {
                 border: 2px solid black;
