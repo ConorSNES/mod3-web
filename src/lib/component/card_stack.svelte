@@ -38,7 +38,7 @@
             box-sizing: border-box;
 
             border: 4px solid black;
-            background: url("$lib/assets/dither.png");
+            background: url("$lib/assets/generic/dither.png");
             opacity: 0.2;
 
             width: var(--width);

@@ -146,7 +146,7 @@
     @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap");
 
     #game {
-        background-color: white;
+        background-color: #fff;
         border: 2px solid black;
 
         display: flex;

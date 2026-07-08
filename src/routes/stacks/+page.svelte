@@ -86,6 +86,8 @@
         gap: 16px;
         padding: 32px;
 
+        min-height: 10em;
+
         border: 2px dashed green;
     }
 </style>

@@ -2,10 +2,9 @@
 Definition of the actual game state and logic.
 */
 
-import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
 import type Card from "./card";
 import card_deck from "./card_deck";
-import { uniformInt } from "pure-rand/distribution/uniformInt";
+import fisher_yates from "./fisher_yates";
 
 export type StackState_Row = "ones" | "twos" | "threes" | "random" | "special";
 export type StackState_Coord = { v: string, w: string };
@@ -62,21 +61,9 @@ export default class GameState {
 
     public onMut : () => void = () => {};
 
-    /// Fisher-Yates shuffle algorithm. (https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
-    /// There's no quick prng support, so a library is linked in to avoid browser weirdness (and actually allow seeding).
-    /// This also (should ideally) avoid implementing algorithms in js!
-    private static fisher_yates<T>(value: T[], prng: number): T[] {
-        const random = xoroshiro128plus(prng);
-        const o = value;
-        for (let i = 0; i < o.length; i++) {
-            o[uniformInt(random, 0, o.length - 1)] = o[i];
-        }
-        return o;
-    }
-
     private constructor(seed?: number) {
         this.seed = seed ?? Date.now();
-        this.stackstate["special"]["deck"] = GameState.fisher_yates(card_deck().concat(card_deck()), this.seed);
+        this.stackstate["special"]["deck"] = fisher_yates(card_deck().concat(card_deck()), this.seed);
     }
 
     private coord_validate(coord: StackState_Coord): void | never {

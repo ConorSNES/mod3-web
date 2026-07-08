@@ -7,7 +7,7 @@
     import { height, width } from "$lib/cardscale";
 
     let {
-        gamestate = $bindable(GameState.quick_start()),
+        gamestate = $bindable(GameState.quick_start())
     }: { gamestate?: GameState } = $props();
 
     let gamehash = $state(0);
@@ -17,8 +17,6 @@
 
     $effect(() => {
         gamestate.onMut = () => {
-            //console.log("the game state has mutated. will svelte give a damn? who knows!!");
-            //console.log(gamestate.to_string());
             rehash();
         };
     });
@@ -150,7 +148,7 @@
         .aces {
             grid-column: 9;
             grid-row-start: 1;
-            grid-row-end: 3;
+            grid-row-end: 4;
 
             padding-left: 16px;
         }
