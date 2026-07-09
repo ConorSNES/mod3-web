@@ -2,16 +2,23 @@
 Definition of the actual game state and logic.
 */
 
-import type Card from "./card";
+import Card from "./card";
 import card_deck from "./card_deck";
-import fisher_yates from "./fisher_yates";
+import fisher_yates from "./generic/fisher_yates";
+import Subscription from "./generic/subscription";
 
 export type StackState_Row = "ones" | "twos" | "threes" | "random" | "special";
 export type StackState_Coord = { v: string, w: string };
 
 export default class GameState {
+    /**
+     * Numeric seed used in shuffling the deck of this game.
+     */
     public readonly seed: number;
 
+    /**
+     * Internal state of all stacks in play, including deck and aces pile.
+     */
     private stackstate: { [v: string]: { [w: string]: Card[] } } = {
         "ones": {
             "0": [],
@@ -59,7 +66,12 @@ export default class GameState {
         }
     }
 
-    public onMut : () => void = () => {};
+    private _starttime : number | null = null;
+    public get starttime() {
+        return this._starttime;
+    }
+
+    public onMut : Subscription = new Subscription([ () => { this._starttime ??= Date.now(); } ]);
 
     private constructor(seed?: number) {
         this.seed = seed ?? Date.now();
@@ -97,7 +109,7 @@ export default class GameState {
         const intermediary = this.stackstate[from_v][from_w].pop();
         if (!intermediary) throw `No card in origin stack! (from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
         this.stackstate[to_v][to_w].push(intermediary);
-        this.onMut();
+        this.onMut.emit();
     }
 
     private automation() {
@@ -165,7 +177,11 @@ export default class GameState {
         return Object.freeze(this.stackstate[rowid]);
     }
 
-    /// Collect comprehensive view of gamestate (excl. aces).
+    /**
+     * Collects a view of all 
+     * 
+     * @returns Object-of-objects representing all conventional stacks on the board
+     */
     public get_view(): { [v: string]: { [w: string]: Card[] } } {
         return {
             "ones": this.get_row("ones"),
@@ -175,7 +191,6 @@ export default class GameState {
         }
     }
 
-    /// Collect current array of aces.
     public get_aces(): readonly Card[] {
         return this.stackstate["special"]["aces"];
     }
@@ -255,6 +270,64 @@ export default class GameState {
             o+=" ";
         }
         else o += "[] ";
+        return o;
+    }
+
+    /** 
+     * Returns true if the game has been won. 
+     */
+    public is_won() : boolean {
+        // return false if deck is not empty
+        if (this.get_deck_count() > 0) return false;
+
+        // return false if aces have not been settled
+        if (this.stackstate["special"]["aces"].length < 8) return false;
+
+        // return false if any random stack is occupied
+        for (let i = 0; i < 8; i++) {
+            if (this.stackstate["random"][i.toString()].length > 0) return false;
+        }
+        // otherwise, the game has been won
+        return true;
+    }
+
+    /**
+     * Convert a particular GameState into string format for storage.
+     * 
+     * **Does not preserve onMut bindings!**
+     */
+    public static serialize(v : GameState) : string {
+        return JSON.stringify(v);
+    }
+
+    /// deserialize game state from string (!important: onMut subscriptions are not encoded or decoded!)
+    /**
+     * Convert a stored string into a functioning GameState.
+     * 
+     * **Does not preserve onMut bindings!**
+     */
+    public static deserialize(v : string) : GameState {
+        function deserialize_cards(stack : object[]) : Card[] {
+            return stack.map(raw=>Card.from_object(raw));
+        }
+
+        
+        // to preserve object data, the parsed data is copied into a logically existant GameState which is then yielded from this func
+        const parsed = JSON.parse(v) as GameState;
+        const o = new GameState(parsed.seed);
+
+        o._starttime = parsed._starttime;
+
+        o.stackstate = parsed.stackstate;
+        // assert cards
+        ["twos", "threes", "ones", "random"].forEach(row => 
+            ["0", "1", "2", "3", "4", "5", "6", "7"].forEach(col => 
+                o.stackstate[row][col] = deserialize_cards(o.stackstate[row][col])
+            )
+        );
+        o.stackstate["special"]["aces"] = deserialize_cards(o.stackstate["special"]["aces"]);
+        o.stackstate["special"]["deck"] = deserialize_cards(o.stackstate["special"]["deck"]);
+
         return o;
     }
 }

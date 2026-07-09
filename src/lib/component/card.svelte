@@ -2,7 +2,7 @@
     import type Card from "$lib/card";
     import card_to_image from "$lib/card_to_image";
     import { height, width } from "$lib/cardscale";
-    import delay from "$lib/delay";
+    import delay from "$lib/generic/delay";
 
     let {
         card,

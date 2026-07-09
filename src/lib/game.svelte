@@ -9,8 +9,9 @@
     import ManagedGameState from "./component/managed_game_state.svelte";
     import NoSsr from "./component/generic/no_ssr.svelte";
     import GameState from "./gamestate";
-    import { BrowserStored } from "./browser-stored";
+    import { BrowserStored } from "./browser_stored";
     import { onMount } from "svelte";
+    import DelayLoop from "./generic/delay_loop";
 
     var self: HTMLElement;
 
@@ -59,9 +60,13 @@
 
     // manage dark theme
 
-    let meta_darktheme = new BrowserStored("darktheme", false, (v) => v ? v === "true" : null);
+    let meta_darktheme = new BrowserStored("darktheme", false, (v) =>
+        v ? v === "true" : null,
+    );
     let darktheme: boolean = $state(meta_darktheme.default_val);
-    onMount(() => {darktheme = meta_darktheme.value});
+    onMount(() => {
+        darktheme = meta_darktheme.value;
+    });
     $effect(() => {
         meta_darktheme.value = darktheme;
 
@@ -69,19 +74,60 @@
         else self.classList.remove("dark");
     });
 
+    // start time management
+    let start_time: number | null = $state(null);
+    function update_start_time() {
+        start_time = gamestate.starttime;
+        elapsed_time_loop.start();
+    }
+    let elapsed_time: Date | null = $state(null);
+    function update_elapsed_time() {
+        elapsed_time = start_time
+            ? new Date(Math.abs(Date.now() - start_time))
+            : null;
+    }
+    const elapsed_time_loop = new DelayLoop(300, update_elapsed_time);
+
     // manage game state
-    let gamestate: GameState = $state(GameState.quick_start());
+    let meta_gamestate = new BrowserStored(
+        "save",
+        GameState.quick_start(),
+        (v) => (v ? GameState.deserialize(v) : null),
+        GameState.serialize,
+    );
+    let gamestate: GameState = $state(meta_gamestate.default_val);
+    onMount(() => {
+        gamestate = meta_gamestate.value;
+        gamestate.onMut.subscribe(() => {
+            update_start_time();
+            meta_gamestate.value = gamestate;
+        });
+        update_start_time();
+    });
 
     function new_game() {
         gamestate = GameState.quick_start();
+        gamestate.onMut.subscribe(() => {
+            update_start_time();
+            meta_gamestate.value = gamestate;
+        });
+        update_start_time();
     }
 </script>
 
 <main id="game" bind:this={self}>
     <header>
+        <span class={"timer " + (elapsed_time ? "" : "subtle")}>
+            {#if elapsed_time}
+                {elapsed_time.getUTCHours()}h {elapsed_time.getUTCMinutes()}m {elapsed_time.getUTCSeconds()}s
+            {:else}
+                0h 0m 0s
+            {/if}
+        </span>
+
         <span class="headerfill">placeholder</span>
 
-        <IconButton 
+        <IconButton
             src={create_new}
             alt="new game"
             title="Start a new game"
@@ -114,7 +160,7 @@
     <article id="gamelayers">
         <div class="panicgamebox">
             <NoSsr>
-                <ManagedGameState bind:gamestate/>
+                <ManagedGameState bind:gamestate />
             </NoSsr>
         </div>
         <div id="config" hidden={!configRaised}>
@@ -171,15 +217,32 @@
 
             :global(> *) {
                 border-left: 2px solid black;
+                height: 100%;
             }
 
             > :first-child {
                 border-left: none;
             }
 
+            > span {
+                white-space: nowrap;
+                text-align: center;
+                line-height: 32px;
+            }
+
             > .headerfill {
                 width: 100%;
-                text-align: center;
+            }
+
+            > .timer {
+                width: max-content;
+
+                padding: 0 8px;
+
+                &.subtle {
+                    font-style: italic;
+                    color: #0000008a;
+                }
             }
         }
 
@@ -203,12 +266,12 @@
             min-height: 128px;
             height: 100%;
 
-            >:global(*) {
+            > :global(*) {
                 grid-column: 1;
                 grid-row: 1;
             }
 
-            >.panicgamebox {
+            > .panicgamebox {
                 display: flex;
                 place-content: center;
                 place-items: center;

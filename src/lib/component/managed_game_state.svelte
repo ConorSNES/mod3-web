@@ -8,22 +8,21 @@
 
     let {
         gamestate = $bindable(GameState.quick_start())
-    }: { gamestate?: GameState } = $props();
+    }: { 
+        gamestate?: GameState
+    } = $props();
 
+    // arbitrary value changing every time the game is mutated
     let gamehash = $state(0);
     function rehash() {
         gamehash += 1;
     }
 
     $effect(() => {
-        gamestate.onMut = () => {
+        gamestate.onMut.subscribe(() => {
             rehash();
-        };
+        });
     });
-
-    //const gamestate_view = $derived(gamestate.get_view());
-    const aces_view = $derived(gamestate.get_aces());
-    //const deck_count = $derived(gamestate.get_deck_count());
 
     // manage held cards
     let held: {
@@ -60,7 +59,7 @@
         held = null;
     }
 
-    // deal cards to "random"
+    // deal cards to "random" stacks
     function deal() {
         gamestate.deal_once();
     }
@@ -70,6 +69,7 @@
     {#key gamehash}
         {@const gamestate_view = gamestate.get_view()}
         {@const deck_count = gamestate.get_deck_count()}
+        {@const aces_view = gamestate.get_aces()}
 
 
         {#each ["twos", "threes", "ones", "random"] as row (row)}
