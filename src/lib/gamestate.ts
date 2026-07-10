@@ -71,7 +71,8 @@ export default class GameState {
         return this._starttime;
     }
 
-    public onMut : Subscription = new Subscription([ () => { this._starttime ??= Date.now(); } ]);
+    public onMut : Subscription = new Subscription();
+
 
     private constructor(seed?: number) {
         this.seed = seed ?? Date.now();
@@ -165,6 +166,8 @@ export default class GameState {
     public static quick_start(seed?: number): GameState {
         const o = new GameState(seed);
         o.initial_deal();
+        // **THIS IS ONLY ASSIGNED HERE, NOT IN CONSTRUCTOR (as it probably should be) TO DEFER MUTATION CHECKS UNTIL AFTER INITIAL SETUP**
+        o.onMut.add(() => { o._starttime ??= Date.now(); });
         return o;
     }
 
