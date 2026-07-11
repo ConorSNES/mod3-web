@@ -151,7 +151,7 @@
                 {#if elapsed_time}
                     {elapsed_time.getUTCHours()}h {fixed_uint_fmt(elapsed_time.getUTCMinutes(), 2)}m {fixed_uint_fmt(elapsed_time.getUTCSeconds(), 2)}s
                 {:else}
-                    00h 00m 00s
+                    0h 00m 00s
                 {/if}
             </span>
         {/if}
