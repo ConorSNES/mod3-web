@@ -15,9 +15,37 @@
 
     var self: HTMLElement;
 
+    /**
+     * Links a meta value with a svelte-reactive one, enforcing persistence.
+     */
+    function link_meta<T>(meta: BrowserStored<T>, svelte: T) {
+        onMount(() => {
+            svelte = meta.value;
+        });
+        $effect(() => {
+            meta.value = svelte;
+        });
+    }
+
     // manage config
 
     let configRaised: boolean = $state(false);
+
+    interface UserConfig {
+        dark_theme: boolean;
+        show_timer: boolean;
+    }
+    const meta_userconfig = new BrowserStored<UserConfig>(
+        "userconfig",
+        {
+            dark_theme: false,
+            show_timer: true,
+        },
+        (v) => (v ? JSON.parse(v) : v),
+        (v) => JSON.stringify(v),
+    );
+    let userconfig = $state(meta_userconfig.default_val);
+    link_meta(meta_userconfig, userconfig);
 
     // manage display state
 
@@ -42,9 +70,15 @@
 
     type DisplayState = 0 | 1 | 2;
 
-    let displayState: DisplayState = $state(0 as DisplayState);
-
+    const meta_displaystate = new BrowserStored<DisplayState>(
+        "displaystate",
+        0 as DisplayState,
+        v => v ? Math.min(Math.max(parseInt(v), 0), 2) as DisplayState : null
+    )
+    let displayState: DisplayState = $state(meta_displaystate.default_val);
+    onMount(()=>displayState = meta_displaystate.value);
     $effect(() => {
+        meta_displaystate.value = displayState;
         switch (displayState) {
             case 0:
                 doViewportReset();
@@ -58,35 +92,30 @@
         }
     });
 
-    // manage dark theme
-
-    let meta_darktheme = new BrowserStored("darktheme", false, (v) =>
-        v ? v === "true" : null,
-    );
-    let darktheme: boolean = $state(meta_darktheme.default_val);
-    onMount(() => {
-        darktheme = meta_darktheme.value;
-    });
-    $effect(() => {
-        meta_darktheme.value = darktheme;
-
-        if (darktheme) self.classList.add("dark");
-        else self.classList.remove("dark");
-    });
-
-    // start time management
-    let start_time: number | null = $state(null);
-    function update_start_time() {
-        start_time = gamestate.starttime;
-        elapsed_time_loop.start();
-    }
-    let elapsed_time: Date | null = $state(null);
+    // timer management
+    let elapsed_time: Date | null = $state(null as Date | null);
     function update_elapsed_time() {
-        elapsed_time = start_time
-            ? new Date(Math.abs(Date.now() - start_time))
+        elapsed_time = gamestate.starttime
+            ? new Date(Math.abs(Date.now() - gamestate.starttime))
             : null;
     }
     const elapsed_time_loop = new DelayLoop(300, update_elapsed_time);
+
+    /**
+     * Custom function fixing numeric to fixed length, as javascript's number formatting does not support this.
+     * 
+     * Thank you, Simon Rigét, for your algorithm.
+     * src: https://stackoverflow.com/questions/1127905/how-can-i-format-an-integer-to-a-specific-length-in-javascript
+     */
+    function fixed_uint_fmt(v : number, len : number) : string {
+        return String(v).padStart(len, "0");
+    }
+
+    // manage notifications
+    let notification = $state(null as string | null);
+    function notification_check() {
+        if (!gamestate.is_moves_available()) notification = "There are no more moves.";
+    }
 
     // manage game state
     let meta_gamestate = new BrowserStored(
@@ -96,36 +125,38 @@
         GameState.serialize,
     );
     let gamestate: GameState = $state(meta_gamestate.default_val);
+    const gamestate_onMut = () => {
+        meta_gamestate.value = gamestate;
+        notification_check();
+    };
     onMount(() => {
         gamestate = meta_gamestate.value;
-        gamestate.onMut.subscribe(() => {
-            update_start_time();
-            meta_gamestate.value = gamestate;
-        });
-        update_start_time();
+        gamestate.onMut.subscribe(gamestate_onMut);
+        elapsed_time_loop.start();
+        notification_check();
     });
 
     function new_game() {
         gamestate = GameState.quick_start();
-        gamestate.onMut.subscribe(() => {
-            update_start_time();
-            meta_gamestate.value = gamestate;
-        });
-        update_start_time();
+        gamestate.onMut.subscribe(gamestate_onMut);
+        elapsed_time_loop.start();
+        notification = null;
     }
 </script>
 
-<main id="game" bind:this={self}>
+<main id="game" bind:this={self} class={userconfig.dark_theme ? "dark" : ""}>
     <header>
-        <span class={"timer " + (elapsed_time ? "" : "subtle")}>
-            {#if elapsed_time}
-                {elapsed_time.getUTCHours()}h {elapsed_time.getUTCMinutes()}m {elapsed_time.getUTCSeconds()}s
-            {:else}
-                0h 0m 0s
-            {/if}
-        </span>
+        {#if userconfig.show_timer}
+            <span class={"timer " + (elapsed_time ? "" : "subtle")}>
+                {#if elapsed_time}
+                    {elapsed_time.getUTCHours()}h {fixed_uint_fmt(elapsed_time.getUTCMinutes(), 2)}m {fixed_uint_fmt(elapsed_time.getUTCSeconds(), 2)}s
+                {:else}
+                    00h 00m 00s
+                {/if}
+            </span>
+        {/if}
 
-        <span class="headerfill">placeholder</span>
+        <span class="headerfill">Mod3</span>
 
         <IconButton
             src={create_new}
@@ -178,7 +209,21 @@
                         <tbody>
                             <tr>
                                 <td>Dark theme (invert colours)</td>
-                                <td><Switch fill bind:value={darktheme} /></td>
+                                <td>
+                                    <Switch
+                                        fill
+                                        bind:value={userconfig.dark_theme}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Show timer</td>
+                                <td>
+                                    <Switch 
+                                        fill
+                                        bind:value={userconfig.show_timer}
+                                    />
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -186,6 +231,11 @@
             </div>
         </div>
     </article>
+    {#if notification}
+    <footer>
+        <span>{notification}</span>
+    </footer>
+    {/if}
 </main>
 
 <style>
@@ -321,6 +371,28 @@
 
             &[hidden] {
                 display: none;
+            }
+        }
+
+        footer {
+            color: #fff;
+            background: #000;
+
+            box-sizing: border-box;
+            height: 32px;
+            padding: 4px;
+
+            overflow: hidden;
+            text-align: center;
+
+            transition-property: height, color, background;
+            transition-duration: 200ms;
+            transition-timing-function: ease-out;
+
+            @starting-style {
+                color: #000;
+                background: #fff;
+                height : 0;
             }
         }
     }

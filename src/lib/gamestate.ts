@@ -10,6 +10,9 @@ import Subscription from "./generic/subscription";
 export type StackState_Row = "ones" | "twos" | "threes" | "random" | "special";
 export type StackState_Coord = { v: string, w: string };
 
+/**
+ * Single instance of a mod3 game's managed state and logic.
+ */
 export default class GameState {
     /**
      * Numeric seed used in shuffling the deck of this game.
@@ -295,6 +298,40 @@ export default class GameState {
     }
 
     /**
+     * Returns true if the player can perform a move.
+     */
+    public is_moves_available() : boolean {
+        // if the deck can be dealt, a move can be done
+        if (this.stackstate["special"]["deck"].length > 0) return true;
+
+        // begin checking logic for all stacks
+        for (const row of ["twos", "threes", "ones", "random"]) {
+            for (const col of ["0", "1", "2", "3", "4", "5", "6", "7"]) {
+                const coord_from = {v: row, w: col};
+
+                // if a card may be grabbed from this pile...
+                if (this.get_grab_logic(coord_from)) {
+                    const peek_from = this.peek(coord_from);
+
+                    for (const row2 of ["twos", "threes", "ones", "random"]) {
+                        for (const col2 of ["0", "1", "2", "3", "4", "5", "6", "7"]) { 
+                            const coord_to = {v: row2, w: col2};
+                            
+                            // and dropped on another...
+                            if (this.get_drop_logic(coord_to, peek_from)) 
+                                // a move has been found!
+                                return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // if no check passes, there are no more moves.
+        return false;
+    }
+
+    /**
      * Convert a particular GameState into string format for storage.
      * 
      * **Does not preserve onMut bindings!**
@@ -303,7 +340,6 @@ export default class GameState {
         return JSON.stringify(v);
     }
 
-    /// deserialize game state from string (!important: onMut subscriptions are not encoded or decoded!)
     /**
      * Convert a stored string into a functioning GameState.
      * 
