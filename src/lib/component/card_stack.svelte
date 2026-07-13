@@ -34,13 +34,9 @@
             }
 
             /* peeking */
-            &:hover:not(:nth-last-child(-n + 2)) {
+            &:hover:not(:nth-last-child(-n + 2))>:global(img) {
                 z-index: 10;
                 opacity: 0.8;
-
-                user-select: none;
-                -webkit-user-select: none;
-                pointer-events: none;
             }
         }
 
