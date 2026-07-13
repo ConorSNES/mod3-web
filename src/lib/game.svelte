@@ -9,23 +9,13 @@
     import ManagedGameState from "./component/managed_game_state.svelte";
     import NoSsr from "./component/generic/no_ssr.svelte";
     import GameState from "./gamestate";
-    import { BrowserStored } from "./browser_stored";
+    import { BrowserStored } from "./generic/browser_stored";
     import { onMount } from "svelte";
     import DelayLoop from "./generic/delay_loop";
+    import { CardScale } from "./cardscale";
+    import Range from "./component/generic/range.svelte";
 
     var self: HTMLElement;
-
-    /**
-     * Links a meta value with a svelte-reactive one, enforcing persistence.
-     */
-    function link_meta<T>(meta: BrowserStored<T>, svelte: T) {
-        onMount(() => {
-            svelte = meta.value;
-        });
-        $effect(() => {
-            meta.value = svelte;
-        });
-    }
 
     // manage config
 
@@ -35,6 +25,8 @@
         dark_theme: boolean;
         show_timer: boolean;
         show_movecount: boolean;
+        card_scale: number;
+        prefer_fullscreen: boolean;
     }
     const meta_userconfig = new BrowserStored<UserConfig>(
         "userconfig",
@@ -42,17 +34,22 @@
             dark_theme: false,
             show_timer: true,
             show_movecount: true,
+            card_scale: 0.8,
+            prefer_fullscreen: false,
         },
         (v) => (v ? JSON.parse(v) : v),
         (v) => JSON.stringify(v),
     );
     let userconfig = $state(meta_userconfig.default_val);
-    link_meta(meta_userconfig, userconfig);
+    onMount(()=>{userconfig = meta_userconfig.value});
+    $effect(()=>{
+        meta_userconfig.value = userconfig;
+        CardScale.scale = userconfig.card_scale;
+    });
 
     // manage display state
 
     function doViewportReset() {
-        self.classList.remove("fullviewport");
         document.documentElement.style = "";
         document.body.style = "";
         if (document.fullscreenElement) document.exitFullscreen();
@@ -65,7 +62,6 @@
 
     function doFullviewport() {
         doViewportReset();
-        self.classList.add("fullviewport");
         document.documentElement.style = "overflow:hidden; height:100vh;";
         document.body.style = "overflow:hidden; height:100vh;";
     }
@@ -75,10 +71,11 @@
     const meta_displaystate = new BrowserStored<DisplayState>(
         "displaystate",
         0 as DisplayState,
-        v => v ? Math.min(Math.max(parseInt(v), 0), 2) as DisplayState : null
-    )
+        (v) =>
+            v ? (Math.min(Math.max(parseInt(v), 0), 2) as DisplayState) : null,
+    );
     let displayState: DisplayState = $state(meta_displaystate.default_val);
-    onMount(()=>displayState = meta_displaystate.value);
+    onMount(() => (displayState = meta_displaystate.value));
     $effect(() => {
         meta_displaystate.value = displayState;
         switch (displayState) {
@@ -94,12 +91,26 @@
         }
     });
 
+    // win counter
+    const meta_wincount = new BrowserStored<number>(
+        "wincount",
+        0 as number,
+        (v) => (v ? parseInt(v) : null),
+    );
+    let wincount = $state(meta_wincount.default_val);
+    onMount(() => {
+        wincount = meta_wincount.value;
+    });
+    $effect(() => {
+        meta_wincount.value = wincount;
+    });
+
     // timer management
     let elapsed_time: Date | null = $state(null as Date | null);
     function update_elapsed_time() {
         if (gamestate.wintime) elapsed_time_loop.break();
         elapsed_time = gamestate.starttime
-            ? gamestate.wintime 
+            ? gamestate.wintime
                 ? new Date(Math.abs(gamestate.wintime - gamestate.starttime))
                 : new Date(Math.abs(Date.now() - gamestate.starttime))
             : null;
@@ -110,11 +121,11 @@
 
     /**
      * Custom function fixing numeric to fixed length, as javascript's number formatting does not support this.
-     * 
+     *
      * Thank you, Simon Rigét, for your algorithm.
      * src: https://stackoverflow.com/questions/1127905/how-can-i-format-an-integer-to-a-specific-length-in-javascript
      */
-    function fixed_uint_fmt(v : number, len : number) : string {
+    function fixed_uint_fmt(v: number, len: number): string {
         return String(v).padStart(len, "0");
     }
 
@@ -156,12 +167,15 @@
     }
 </script>
 
-<main id="game" bind:this={self} class={userconfig.dark_theme ? "dark" : ""}>
+<main id="game" bind:this={self} class={(userconfig.dark_theme ? "dark" : "") + (displayState === 1 ? " fullviewport" : "")}>
     <header>
         {#if userconfig.show_timer}
             <span class={"timer " + (elapsed_time ? "" : "subtle")}>
                 {#if elapsed_time}
-                    {Math.floor(elapsed_time.getTime() / 3600000)}h {fixed_uint_fmt(elapsed_time.getUTCMinutes(), 2)}m {fixed_uint_fmt(elapsed_time.getUTCSeconds(), 2)}s
+                    {Math.floor(elapsed_time.getTime() / 3600000)}h {fixed_uint_fmt(
+                        elapsed_time.getUTCMinutes(),
+                        2,
+                    )}m {fixed_uint_fmt(elapsed_time.getUTCSeconds(), 2)}s
                 {:else}
                     0h 00m 00s
                 {/if}
@@ -174,7 +188,7 @@
             </span>
         {/if}
 
-        <span class="headerfill">Mod3</span>
+        <span class="headerfill"></span>
 
         <IconButton
             src={create_new}
@@ -195,7 +209,7 @@
                 src={maximize}
                 alt="maximise"
                 title="Maximise this game view (+shift for fullscreen)"
-                onclick={(e) => (displayState = e.shiftKey ? 2 : 1)}
+                onclick={(e) => (displayState = (e.shiftKey != userconfig.prefer_fullscreen) ? 2 : 1)}
             />
         {:else}
             <IconButton
@@ -237,7 +251,7 @@
                             <tr>
                                 <td>Show timer</td>
                                 <td>
-                                    <Switch 
+                                    <Switch
                                         fill
                                         bind:value={userconfig.show_timer}
                                     />
@@ -252,6 +266,19 @@
                                     />
                                 </td>
                             </tr>
+                            <tr>
+                                <td>Card scale</td>
+                                <td>
+                                    <Range bind:value={userconfig.card_scale} min={0.1} max={2.0} step={0.1} label/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Prefer fullscreen when maximizing game</td>
+                                <td>
+                                    <Switch 
+                                        fill bind:value={userconfig.prefer_fullscreen}/>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </article>
@@ -259,9 +286,9 @@
         </div>
     </article>
     {#if notification}
-    <footer>
-        <span>{notification}</span>
-    </footer>
+        <footer>
+            <span>{notification}</span>
+        </footer>
     {/if}
 </main>
 
@@ -423,7 +450,7 @@
             @starting-style {
                 color: #000;
                 background: #fff;
-                height : 0;
+                height: 0;
             }
         }
     }

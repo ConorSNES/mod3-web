@@ -1,6 +1,16 @@
 <script lang="ts">
-    import { height, width } from "$lib/cardscale";
-    import type { Snippet } from "svelte";
+    import { CardScale } from "$lib/cardscale";
+    import { onDestroy, onMount, type Snippet } from "svelte";
+
+    let height = $state(CardScale.height);
+    let width = $state(CardScale.width);
+    function update_cardscale() {
+        height = CardScale.height;
+        width = CardScale.width;
+    }
+    onMount(()=>CardScale.onMut.subscribe(update_cardscale));
+    onDestroy(()=>CardScale.onMut.unsubscribe(update_cardscale));
+
 
     let { children, allowdrop = false, ondrop = ()=>{} } : { children? : Snippet, allowdrop?: boolean, ondrop? : ()=>void } = $props();
 </script>

@@ -1,8 +1,18 @@
 <script lang="ts">
     import type Card from "$lib/card";
     import card_to_image from "$lib/card_to_image";
-    import { height, width } from "$lib/cardscale";
+    import { CardScale } from "$lib/cardscale";
     import delay from "$lib/generic/delay";
+    import { onDestroy, onMount } from "svelte";
+
+    let height = $state(CardScale.height);
+    let width = $state(CardScale.width);
+    function update_cardscale() {
+        height = CardScale.height;
+        width = CardScale.width;
+    }
+    onMount(()=>CardScale.onMut.subscribe(update_cardscale));
+    onDestroy(()=>CardScale.onMut.unsubscribe(update_cardscale));
 
     let {
         card,

@@ -18,11 +18,12 @@
 <style>
     button {
         display: flex;
+        place-content: center;
 
         box-sizing: content-box;
         cursor: pointer;
         border: none;
-        background: white;
+        background: #0000;
         padding: 0;
 
         transition: all 150ms ease-out;
@@ -31,12 +32,12 @@
 
         &:hover,
         &:focus {
-            background: #e2e2e2;
+            background: #0002;
             transition: none;
         }
 
         &:active {
-            background: #bdbdbd;
+            background: #0006;
             transition: none;
         }
 
