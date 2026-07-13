@@ -28,8 +28,19 @@
             /* transition: margin-top 200ms ease-out;  */
 
             margin-top: calc(var(--height) * -1);
+            
             &:first-child {
                 margin-top: 0;
+            }
+
+            /* peeking */
+            &:hover:not(:nth-last-child(-n + 2)) {
+                z-index: 10;
+                opacity: 0.8;
+
+                user-select: none;
+                -webkit-user-select: none;
+                pointer-events: none;
             }
         }
 
@@ -44,14 +55,18 @@
             width: var(--width);
             height: var(--height);
 
-            transition: opacity 200ms;
+            transition: opacity 200ms ease-out;
 
             &:hover {
                 opacity: 1.0;
             }
 
             &.hide {
-                visibility: hidden;
+                opacity: 0;
+
+                user-select: none;
+                -webkit-user-select: none;
+                pointer-events: none;
             }
         }
 

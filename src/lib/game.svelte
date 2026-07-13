@@ -34,12 +34,14 @@
     interface UserConfig {
         dark_theme: boolean;
         show_timer: boolean;
+        show_movecount: boolean;
     }
     const meta_userconfig = new BrowserStored<UserConfig>(
         "userconfig",
         {
             dark_theme: false,
             show_timer: true,
+            show_movecount: true,
         },
         (v) => (v ? JSON.parse(v) : v),
         (v) => JSON.stringify(v),
@@ -95,11 +97,16 @@
     // timer management
     let elapsed_time: Date | null = $state(null as Date | null);
     function update_elapsed_time() {
+        if (gamestate.wintime) elapsed_time_loop.break();
         elapsed_time = gamestate.starttime
-            ? new Date(Math.abs(Date.now() - gamestate.starttime))
+            ? gamestate.wintime 
+                ? new Date(Math.abs(gamestate.wintime - gamestate.starttime))
+                : new Date(Math.abs(Date.now() - gamestate.starttime))
             : null;
     }
     const elapsed_time_loop = new DelayLoop(300, update_elapsed_time);
+
+    let movecount = $state(0);
 
     /**
      * Custom function fixing numeric to fixed length, as javascript's number formatting does not support this.
@@ -114,7 +121,9 @@
     // manage notifications
     let notification = $state(null as string | null);
     function notification_check() {
-        if (!gamestate.is_moves_available()) notification = "There are no more moves.";
+        if (!gamestate.is_moves_available() && !gamestate.is_won()) {
+            notification = "There are no more moves.";
+        }
     }
 
     // manage game state
@@ -127,10 +136,12 @@
     let gamestate: GameState = $state(meta_gamestate.default_val);
     const gamestate_onMut = () => {
         meta_gamestate.value = gamestate;
+        movecount = gamestate.movecount;
         notification_check();
     };
     onMount(() => {
         gamestate = meta_gamestate.value;
+        movecount = gamestate.movecount;
         gamestate.onMut.subscribe(gamestate_onMut);
         elapsed_time_loop.start();
         notification_check();
@@ -138,6 +149,7 @@
 
     function new_game() {
         gamestate = GameState.quick_start();
+        movecount = gamestate.movecount;
         gamestate.onMut.subscribe(gamestate_onMut);
         elapsed_time_loop.start();
         notification = null;
@@ -149,10 +161,16 @@
         {#if userconfig.show_timer}
             <span class={"timer " + (elapsed_time ? "" : "subtle")}>
                 {#if elapsed_time}
-                    {elapsed_time.getUTCHours()}h {fixed_uint_fmt(elapsed_time.getUTCMinutes(), 2)}m {fixed_uint_fmt(elapsed_time.getUTCSeconds(), 2)}s
+                    {Math.floor(elapsed_time.getTime() / 3600000)}h {fixed_uint_fmt(elapsed_time.getUTCMinutes(), 2)}m {fixed_uint_fmt(elapsed_time.getUTCSeconds(), 2)}s
                 {:else}
                     0h 00m 00s
                 {/if}
+            </span>
+        {/if}
+
+        {#if userconfig.show_movecount}
+            <span class="timer">
+                Moves: {movecount}
             </span>
         {/if}
 
@@ -222,6 +240,15 @@
                                     <Switch 
                                         fill
                                         bind:value={userconfig.show_timer}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Show move counter</td>
+                                <td>
+                                    <Switch
+                                        fill
+                                        bind:value={userconfig.show_movecount}
                                     />
                                 </td>
                             </tr>
@@ -365,6 +392,10 @@
                         &:last-child {
                             border-left: 2px solid black;
                         }
+                    }
+
+                    tr:nth-child(even) {
+                        background: #eee;
                     }
                 }
             }

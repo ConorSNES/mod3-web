@@ -69,9 +69,21 @@ export default class GameState {
         }
     }
 
+    // manage readonly stats
+
     private _starttime : number | null = null;
     public get starttime() {
         return this._starttime;
+    }
+
+    private _wintime : number | null = null;
+    public get wintime() {
+        return this._wintime;
+    }
+
+    private _movecount : number = 0;
+    public get movecount() {
+        return this._movecount;
     }
 
     public onMut : Subscription = new Subscription();
@@ -114,6 +126,12 @@ export default class GameState {
         if (!intermediary) throw `No card in origin stack! (from: ${from_v}.${from_w}, to: ${to_v}.${to_w})`;
         this.stackstate[to_v][to_w].push(intermediary);
         this.onMut.emit();
+
+        // update move count where the move is not automation
+        if (!(
+                from_v == "special" && from_w == "deck" ||
+                to_v == "special" && to_w == "aces"
+            )) this._movecount++;
     }
 
     private automation() {
@@ -170,7 +188,10 @@ export default class GameState {
         const o = new GameState(seed);
         o.initial_deal();
         // **THIS IS ONLY ASSIGNED HERE, NOT IN CONSTRUCTOR (as it probably should be) TO DEFER MUTATION CHECKS UNTIL AFTER INITIAL SETUP**
-        o.onMut.add(() => { o._starttime ??= Date.now(); });
+        o.onMut.add(() => { 
+            o._starttime ??= Date.now();
+            o.is_won();
+        });
         return o;
     }
 
@@ -252,6 +273,13 @@ export default class GameState {
         }
     }
 
+    /**
+     * Formats the gamestate for casual viewing in terminal. 
+     * 
+     * **Not all data is visible**- see `GameState.serialize()` for storage methods!
+     * 
+     * @returns Human-readable string of gamestate.
+     */
     public to_string() : string {
         let o = "game:\n";
         ["twos", "threes", "ones", "random"].forEach(row => {
@@ -278,6 +306,7 @@ export default class GameState {
         else o += "[] ";
         return o;
     }
+    public toString = this.to_string;
 
     /** 
      * Returns true if the game has been won. 
@@ -294,6 +323,7 @@ export default class GameState {
             if (this.stackstate["random"][i.toString()].length > 0) return false;
         }
         // otherwise, the game has been won
+        this._wintime = Date.now();
         return true;
     }
 
@@ -356,6 +386,8 @@ export default class GameState {
         const o = new GameState(parsed.seed);
 
         o._starttime = parsed._starttime;
+        o._wintime = parsed._wintime;
+        o._movecount = parsed._movecount;
 
         o.stackstate = parsed.stackstate;
         // assert cards

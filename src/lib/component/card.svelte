@@ -96,9 +96,6 @@
                     transform 100ms cubic-bezier(0.25, 1, 0.5, 1),
                     box-shadow 200ms ease-out;
             }
-
-            /* &:hover>img {
-            } */
         }
 
         &:not(.cangrab) {
