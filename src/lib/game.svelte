@@ -133,7 +133,8 @@
     let notification = $state(null as string | null);
     function notification_check() {
         if (!gamestate.is_moves_available() && !gamestate.is_won()) {
-            notification = "There are no more moves.";
+            if (gamestate.is_won()) notification = "This game has been won.";
+            else notification = "There are no more moves.";
         }
     }
 
@@ -149,6 +150,7 @@
         meta_gamestate.value = gamestate;
         movecount = gamestate.movecount;
         notification_check();
+        if (gamestate.is_won()) wincount++;
     };
     onMount(() => {
         gamestate = meta_gamestate.value;
@@ -189,6 +191,10 @@
         {/if}
 
         <span class="headerfill"></span>
+
+        {#if wincount > 0}
+            <span class="timer">Wins: {wincount}</span>
+        {/if}
 
         <IconButton
             src={create_new}

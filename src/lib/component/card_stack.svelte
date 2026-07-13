@@ -17,7 +17,12 @@
 
 <div class="stack" style="--width: {width}px; --height: {height}px;">
     {@render children?.()}
-    <div class="topbox {allowdrop ? "" : "hide"}" onmouseup={allowdrop ? ondrop : ()=>{}} role="none"></div>
+    <div 
+    class="topbox {allowdrop ? "" : "hide"}" 
+    onmouseup={allowdrop ? ondrop : ()=>{}} 
+    ontouchend={allowdrop ? ondrop : ()=>{}}
+    ontouchcancel={allowdrop ? ondrop : ()=>{}}
+    role="none"></div>
 </div>
 
 <style>

@@ -25,13 +25,17 @@
 
     let self: HTMLDivElement;
 
-    function grab(event: MouseEvent) {
+    function grab(event: MouseEvent | TouchEvent) {
         if (event.shiftKey) return;
+        if (event instanceof TouchEvent) event.preventDefault();
 
         follow(event);
         self.classList.add("grabbed");
         document.addEventListener("mouseup", release);
+        document.addEventListener("touchend", release);
+        document.addEventListener("touchcancel", release);
         document.addEventListener("mousemove", follow);
+        document.addEventListener("touchmove", follow);
         document.body.addEventListener("mouseleave", release);
         delay(10, () => self.classList.add("grabmotion"));
         ongrab(card);
@@ -39,7 +43,10 @@
 
     function release() {
         document.removeEventListener("mouseup", release);
+        document.removeEventListener("touchend", release);
+        document.removeEventListener("touchcancel", release);
         document.removeEventListener("mousemove", follow);
+        document.removeEventListener("touchmove", follow);
         document.body.removeEventListener("mouseleave", release);
 
         if (!self) return;
@@ -54,12 +61,13 @@
     let dograb = $derived(allowgrab ? grab : () => {});
     let grabclass = $derived(allowgrab ? "cangrab" : "");
 
-    function follow(event: MouseEvent) {
-        self.style.transform = `translateY(${event.clientY - (height / 2.0)}px) translateX(${event.clientX - (width / 2.0)}px)`;
+    function follow(event: MouseEvent | TouchEvent) {
+        const ev = event instanceof MouseEvent ? event : event.touches[0];
+        self.style.transform = `translateY(${ev.clientY - (height / 2.0)}px) translateX(${ev.clientX - (width / 2.0)}px)`;
     }
 </script>
 
-<div bind:this={self} onmousedown={dograb} role="none" class={grabclass}>
+<div bind:this={self} onmousedown={dograb} ontouchstart={dograb} role="none" class={grabclass}>
     <img src={image} alt={card.to_text()} {height} {width} />
 </div>
 
