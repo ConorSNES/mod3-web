@@ -274,6 +274,25 @@ export default class GameState {
     }
 
     /**
+     * Searches all stacks for a valid position to place the provided card into.
+     * 
+     * @param coord Card source.
+     * @param grab Card subject.
+     * @returns Location of target stack, or null if none is available.
+     */
+    public find_quick_drop(coord: StackState_Coord, grab: Card) : StackState_Coord | null {
+        for (const row of ["twos", "threes", "ones", "random"]) {
+            for (const col of ["0", "1", "2", "3", "4", "5", "6", "7"]) { 
+                // skip source stack
+                if (row == coord.v && col == coord.w) continue;
+                const subcoord = {v : row, w : col};
+                if (this.get_drop_logic(subcoord, grab)) return subcoord;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Formats the gamestate for casual viewing in terminal. 
      * 
      * **Not all data is visible**- see `GameState.serialize()` for storage methods!
@@ -342,17 +361,9 @@ export default class GameState {
                 // if a card may be grabbed from this pile...
                 if (this.get_grab_logic(coord_from)) {
                     const peek_from = this.peek(coord_from);
-
-                    for (const row2 of ["twos", "threes", "ones", "random"]) {
-                        for (const col2 of ["0", "1", "2", "3", "4", "5", "6", "7"]) { 
-                            const coord_to = {v: row2, w: col2};
-                            
-                            // and dropped on another...
-                            if (this.get_drop_logic(coord_to, peek_from)) 
-                                // a move has been found!
-                                return true;
-                        }
-                    }
+                    if (!peek_from) continue;
+                    // and dropped on another...
+                    if (this.find_quick_drop(coord_from, peek_from)) return true; // a move has been found!
                 }
             }
         }

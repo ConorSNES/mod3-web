@@ -11,23 +11,29 @@
         allowgrab = true,
         allowdrop = false,
         ongrab = () => {},
+        onquickmove = () => {},
         onrelease = () => {},
-        ondrop = () => {}
+        ondrop = () => {},
     }: {
-        stack?: readonly MetaCard[], // managed stack of cards to vis on this CardStack
-        ident?: any, // identifier for this stack
-        allowgrab?: boolean, // allow grabbing
-        allowdrop?: boolean, // allow mouse release events
-        ongrab?: (v : MetaCard, i : any) => void, // Card ongrab event
-        onrelease?: (v : MetaCard, i : any) => void, // Card onrelease event
-        ondrop? : (i : any) => void
+        stack?: readonly MetaCard[]; // managed stack of cards to vis on this CardStack
+        ident?: any; // identifier for this stack
+        allowgrab?: boolean; // allow grabbing
+        allowdrop?: boolean; // allow mouse release events
+        ongrab?: (v: MetaCard, i: any) => void; // Card ongrab event
+        onquickmove?: (v: MetaCard, i: any) => void;
+        onrelease?: (v: MetaCard, i: any) => void; // Card onrelease event
+        ondrop?: (i: any) => void;
     } = $props();
 
-    function managed_ongrab(v : MetaCard) {
+    function managed_ongrab(v: MetaCard) {
         ongrab(v, ident);
     }
 
-    function managed_onrelease(v : MetaCard) {
+    function managed_onquickmove(v: MetaCard) {
+        onquickmove(v, ident);
+    }
+
+    function managed_onrelease(v: MetaCard) {
         onrelease(v, ident);
     }
 
@@ -36,8 +42,14 @@
     }
 </script>
 
-<CardStack allowdrop={allowdrop} ondrop={managed_ondrop}>
+<CardStack {allowdrop} ondrop={managed_ondrop}>
     {#each stack as card, idx (idx)}
-        <Card {card} allowgrab={allowgrab && (idx + 1 == stack.length)} ongrab={managed_ongrab} onrelease={managed_onrelease}/>
+        <Card
+            {card}
+            allowgrab={allowgrab && idx + 1 == stack.length}
+            ongrab={managed_ongrab}
+            onrelease={managed_onrelease}
+            onquickmove={managed_onquickmove}
+        />
     {/each}
 </CardStack>

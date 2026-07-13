@@ -8,21 +8,29 @@
         height = CardScale.height;
         width = CardScale.width;
     }
-    onMount(()=>CardScale.onMut.subscribe(update_cardscale));
-    onDestroy(()=>CardScale.onMut.unsubscribe(update_cardscale));
+    onMount(() => CardScale.onMut.subscribe(update_cardscale));
+    onDestroy(() => CardScale.onMut.unsubscribe(update_cardscale));
 
-
-    let { children, allowdrop = false, ondrop = ()=>{} } : { children? : Snippet, allowdrop?: boolean, ondrop? : ()=>void } = $props();
+    let {
+        children,
+        allowdrop = false,
+        ondrop = () => {},
+    }: {
+        children?: Snippet;
+        allowdrop?: boolean;
+        ondrop?: () => void;
+    } = $props();
 </script>
 
 <div class="stack" style="--width: {width}px; --height: {height}px;">
     {@render children?.()}
-    <div 
-    class="topbox {allowdrop ? "" : "hide"}" 
-    onmouseup={allowdrop ? ondrop : ()=>{}} 
-    ontouchend={allowdrop ? ondrop : ()=>{}}
-    ontouchcancel={allowdrop ? ondrop : ()=>{}}
-    role="none"></div>
+    <div
+        class="topbox {allowdrop ? '' : 'hide'}"
+        onmouseup={allowdrop ? ondrop : () => {}}
+        ontouchend={allowdrop ? ondrop : () => {}}
+        ontouchcancel={allowdrop ? ondrop : () => {}}
+        role="none"
+    ></div>
 </div>
 
 <style>
@@ -38,24 +46,24 @@
         background-repeat: no-repeat;
         background-size: var(--width) var(--height);
 
-        &>:global(*) {
+        & > :global(*) {
             /* this doesn't work right with card dnd */
             /* transition: margin-top 200ms ease-out;  */
 
             margin-top: calc(var(--height) * -1);
-            
+
             &:first-child {
                 margin-top: 0;
             }
 
             /* peeking */
-            &:hover:not(:nth-last-child(-n + 2))>:global(img) {
+            &:hover:not(:nth-last-child(-n + 2)) > :global(img) {
                 z-index: 10;
                 opacity: 0.8;
             }
         }
 
-        >.topbox {
+        > .topbox {
             visibility: visible;
             box-sizing: border-box;
 
@@ -69,7 +77,7 @@
             transition: opacity 200ms ease-out;
 
             &:hover {
-                opacity: 1.0;
+                opacity: 1;
             }
 
             &.hide {

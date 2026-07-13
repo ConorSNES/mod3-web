@@ -48,6 +48,12 @@
         };
     }
 
+    function quickmove(card: CardData, origin: StackState_Coord) {
+        // Find and perform quick moves
+        const droploc = gamestate.find_quick_drop(origin, card);
+        if (droploc) gamestate.transact(origin, droploc);
+    }
+
     // card recieves drop signal from meta
     function release(card: CardData, origin: StackState_Coord) {
         // nullify held data if the logic lines up
@@ -93,6 +99,7 @@
                         allowgrab={gamestate.get_grab_logic(ident)}
                         allowdrop={gamestate.get_drop_logic(ident, held?.card)}
                         ongrab={grab}
+                        onquickmove={quickmove}
                         onrelease={release}
                         ondrop={drop}
                     />

@@ -11,22 +11,32 @@
         height = CardScale.height;
         width = CardScale.width;
     }
-    onMount(()=>CardScale.onMut.subscribe(update_cardscale));
-    onDestroy(()=>CardScale.onMut.unsubscribe(update_cardscale));
+    onMount(() => CardScale.onMut.subscribe(update_cardscale));
+    onDestroy(() => CardScale.onMut.unsubscribe(update_cardscale));
 
     let {
         card,
         allowgrab = true,
         ongrab = () => {},
-        onrelease = () => {}
-    }: { card: Card; allowgrab?: boolean; ongrab?: (v: Card) => void, onrelease?: (v: Card) => void } = $props();
+        onquickmove = () => {},
+        onrelease = () => {},
+    }: {
+        card: Card;
+        allowgrab?: boolean;
+        ongrab?: (v: Card) => void;
+        onquickmove?: (v: Card) => void;
+        onrelease?: (v: Card) => void;
+    } = $props();
 
     let image = $derived(card_to_image(card));
 
     let self: HTMLDivElement;
 
     function grab(event: MouseEvent | TouchEvent) {
-        if (event.shiftKey) return;
+        if (event.shiftKey) {
+            onquickmove(card);
+            return;
+        }
         if (event instanceof TouchEvent) event.preventDefault();
 
         follow(event);
@@ -52,7 +62,7 @@
         if (!self) return;
         self.style.transform = "";
         self.classList.remove("grabbed");
-        
+
         self.classList.remove("grabmotion");
         onrelease(card);
     }
@@ -63,11 +73,17 @@
 
     function follow(event: MouseEvent | TouchEvent) {
         const ev = event instanceof MouseEvent ? event : event.touches[0];
-        self.style.transform = `translateY(${ev.clientY - (height / 2.0)}px) translateX(${ev.clientX - (width / 2.0)}px)`;
+        self.style.transform = `translateY(${ev.clientY - height / 2.0}px) translateX(${ev.clientX - width / 2.0}px)`;
     }
 </script>
 
-<div bind:this={self} onmousedown={dograb} ontouchstart={dograb} role="none" class={grabclass}>
+<div
+    bind:this={self}
+    onmousedown={dograb}
+    ontouchstart={dograb}
+    role="none"
+    class={grabclass}
+>
     <img src={image} alt={card.to_text()} {height} {width} />
 </div>
 
