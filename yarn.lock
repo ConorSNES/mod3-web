@@ -410,6 +410,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sveltejs/package@npm:^2.5.8":
+  version: 2.5.8
+  resolution: "@sveltejs/package@npm:2.5.8"
+  dependencies:
+    chokidar: "npm:^5.0.0"
+    kleur: "npm:^4.1.5"
+    sade: "npm:^1.8.1"
+    semver: "npm:^7.5.4"
+    svelte2tsx: "npm:~0.7.55"
+  peerDependencies:
+    svelte: ^3.44.0 || ^4.0.0 || ^5.0.0-next.1
+  bin:
+    svelte-package: svelte-package.js
+  checksum: 10c0/4c4858389eab7dd684e88b09dc771f2b3bdde7446dba98782e1bcedc48025c1573b7326d9f507da1d596af4332f265053e9f7b372da71b235036d4428555af41
+  languageName: node
+  linkType: hard
+
 "@sveltejs/vite-plugin-svelte@npm:^7.2.0":
   version: 7.2.0
   resolution: "@sveltejs/vite-plugin-svelte@npm:7.2.0"
@@ -802,6 +819,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chokidar@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "chokidar@npm:5.0.0"
+  dependencies:
+    readdirp: "npm:^5.0.0"
+  checksum: 10c0/42fc907cb2a7ff5c9e220f84dae75380a77997f851c2a5e7865a2cf9ae45dd407a23557208cdcdbf3ac8c93341135a1748e4c48c31855f3bfa095e5159b6bdec
+  languageName: node
+  linkType: hard
+
 "chownr@npm:^3.0.0":
   version: 3.0.0
   resolution: "chownr@npm:3.0.0"
@@ -859,6 +885,13 @@ __metadata:
     supports-color:
       optional: true
   checksum: 10c0/d79136ec6c83ecbefd0f6a5593da6a9c91ec4d7ddc4b54c883d6e71ec9accb5f67a1a5e96d00a328196b5b5c86d365e98d8a3a70856aaf16b4e7b1985e67f5a6
+  languageName: node
+  linkType: hard
+
+"dedent-js@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "dedent-js@npm:1.0.1"
+  checksum: 10c0/a8cff2e02d5a1ce64615c5c53c9789e7ef1abb9ae7bf2322dc991fcbaf08d901ace1a679c1e021de15a85db7787b8ccfb02011e1f394afef0f698fc857a47009
   languageName: node
   linkType: hard
 
@@ -1537,6 +1570,7 @@ __metadata:
     "@eslint/js": "npm:^10.0.1"
     "@sveltejs/adapter-auto": "npm:^7.0.1"
     "@sveltejs/kit": "npm:^2.69.1"
+    "@sveltejs/package": "npm:^2.5.8"
     "@sveltejs/vite-plugin-svelte": "npm:^7.2.0"
     "@types/node": "npm:^26.1.0"
     eslint: "npm:^10.6.0"
@@ -1793,6 +1827,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"readdirp@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "readdirp@npm:5.0.0"
+  checksum: 10c0/faf1ec57cff2020f473128da3f8d2a57813cc3a08a36c38cae1c9af32c1579906cc50ba75578043b35bade77e945c098233665797cf9730ba3613a62d6e79219
+  languageName: node
+  linkType: hard
+
 "rolldown@npm:~1.1.3":
   version: 1.1.3
   resolution: "rolldown@npm:1.1.3"
@@ -1851,7 +1892,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sade@npm:^1.7.4":
+"sade@npm:^1.7.4, sade@npm:^1.8.1":
   version: 1.8.1
   resolution: "sade@npm:1.8.1"
   dependencies:
@@ -1860,7 +1901,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.5, semver@npm:^7.6.3, semver@npm:^7.7.2, semver@npm:^7.7.3":
+"scule@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "scule@npm:1.3.0"
+  checksum: 10c0/5d1736daa10622c420f2aa74e60d3c722e756bfb139fa784ae5c66669fdfe92932d30ed5072e4ce3107f9c3053e35ad73b2461cb18de45b867e1d4dea63f8823
+  languageName: node
+  linkType: hard
+
+"semver@npm:^7.3.5, semver@npm:^7.5.4, semver@npm:^7.6.3, semver@npm:^7.7.2, semver@npm:^7.7.3":
   version: 7.8.5
   resolution: "semver@npm:7.8.5"
   bin:
@@ -1967,6 +2015,19 @@ __metadata:
     svelte:
       optional: true
   checksum: 10c0/c3fed4ddf8e73ca8186a2a4a026c5d8682ab5bb485618d088fd1fdcbf0f5369d842df2aa3697faedb33547a178ce15c425e3ab5fbe1f3e3dc99c49096e427800
+  languageName: node
+  linkType: hard
+
+"svelte2tsx@npm:~0.7.55":
+  version: 0.7.57
+  resolution: "svelte2tsx@npm:0.7.57"
+  dependencies:
+    dedent-js: "npm:^1.0.1"
+    scule: "npm:^1.3.0"
+  peerDependencies:
+    svelte: ^3.55 || ^4.0.0-next.0 || ^4.0 || ^5.0.0-next.0
+    typescript: ^4.9.4 || ^5.0.0 || ^6.0.0
+  checksum: 10c0/240cd89d5bbb3f0ea0089ed142f1c091c4e5934d008e463ee8424732d149581c39e92475522864dcad1c8984bf1b42ab55cef678f79242e2af1514eba5d05257
   languageName: node
   linkType: hard
 
