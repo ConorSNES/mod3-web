@@ -35,6 +35,10 @@
 		"pure-rand": "^8.4.1"
 	},
 	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js"
+		},
 		"./Game.svelte": {
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
