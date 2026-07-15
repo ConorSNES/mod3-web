@@ -1,9 +1,9 @@
 <script lang="ts">
-    import maximize from "$lib/assets/iconkit/maximize.svg";
-    import minimize from "$lib/assets/iconkit/minimize.svg";
-    import config from "$lib/assets/iconkit/config.svg";
-    import tray from "$lib/assets/iconkit/tray.svg";
-    import create_new from "$lib/assets/iconkit/create_new.svg";
+    import maximize from "./assets/iconkit/maximize.svg";
+    import minimize from "./assets/iconkit/minimize.svg";
+    import config from "./assets/iconkit/config.svg";
+    import tray from "./assets/iconkit/tray.svg";
+    import create_new from "./assets/iconkit/create_new.svg";
     import Switch from "./component/generic/switch.svelte";
     import IconButton from "./component/generic/icon_button.svelte";
     import ManagedGameState from "./component/managed_game_state.svelte";

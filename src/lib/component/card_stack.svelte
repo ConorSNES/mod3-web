@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CardScale } from "$lib/cardscale";
+    import { CardScale } from "../cardscale";
     import { onDestroy, onMount, type Snippet } from "svelte";
 
     let height = $state(CardScale.height);

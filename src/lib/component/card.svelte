@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type Card from "$lib/card";
-    import card_to_image from "$lib/card_to_image";
-    import { CardScale } from "$lib/cardscale";
-    import delay from "$lib/generic/delay";
+    import type Card from "../card";
+    import card_to_image from "../card_to_image";
+    import { CardScale } from "../cardscale";
+    import delay from "../generic/delay";
     import { onDestroy, onMount } from "svelte";
 
     let height = $state(CardScale.height);
