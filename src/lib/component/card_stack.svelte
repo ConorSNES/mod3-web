@@ -42,7 +42,7 @@
         justify-content: space-between;
         align-items: start;
 
-        background: url("$lib/assets/deck/position.png");
+        background: url("../assets/deck/position.png");
         background-repeat: no-repeat;
         background-size: var(--width) var(--height);
 
@@ -68,7 +68,7 @@
             box-sizing: border-box;
 
             border: 4px solid black;
-            background: url("$lib/assets/generic/dither.png");
+            background: url("../assets/generic/dither.png");
             opacity: 0.2;
 
             width: var(--width);
@@ -88,10 +88,5 @@
                 pointer-events: none;
             }
         }
-
-        /* Peeking function. unused */
-        /* &.peek>:global(:hover&:not(img, .topbox)) {
-            margin-bottom: 40px;
-        } */
     }
 </style>

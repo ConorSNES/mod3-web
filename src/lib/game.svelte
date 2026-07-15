@@ -315,6 +315,7 @@
         :global(*) {
             font-family: "Noto Sans Mono", "Courier New", Courier, monospace;
             font-weight: 500;
+            color: #000;
         }
 
         header {
