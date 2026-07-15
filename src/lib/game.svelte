@@ -309,6 +309,7 @@
         flex-direction: column;
         margin: 0;
         padding: 0;
+        z-index: 1;
 
         box-sizing: border-box;
 
@@ -336,6 +337,7 @@
             }
 
             > span {
+                display: block;
                 white-space: nowrap;
                 text-align: center;
                 line-height: 32px;
@@ -366,9 +368,31 @@
             width: 100vw;
         }
 
-        /* super arbitrary dark theme */
-        &:global(.dark) {
-            filter: invert();
+        /* 
+        super arbitrary dark theme, 
+        modified to be complicated later as for some reason setting a filter on an element's parent messes with fixed positioning. 
+        */
+        &.dark{
+            position: relative;
+
+            &::after {
+                mix-blend-mode: exclusion;
+                background-color: white;
+                outline: 2px solid white;
+
+                content: "";
+                display: block;
+                box-sizing: border-box;
+                z-index: 10000;
+
+                position: absolute;
+                width: 100%;
+                height: 100%;
+
+                user-select: none;
+                -webkit-user-select: none;
+                pointer-events: none;
+            }
         }
 
         #gamelayers {
@@ -387,7 +411,7 @@
                 place-content: center;
                 place-items: center;
 
-                overflow: auto;
+                overflow: hidden;
 
                 width: 100%;
                 height: 100%;

@@ -32,6 +32,9 @@
 
     let self: HTMLDivElement;
 
+    let grabbed = $state(false);
+    let grabmove = $state(false);
+
     function grab(event: MouseEvent | TouchEvent) {
         if (event.shiftKey) {
             onquickmove(card);
@@ -40,42 +43,50 @@
         if (event instanceof TouchEvent) event.preventDefault();
 
         follow(event);
-        self.classList.add("grabbed");
-        document.addEventListener("mouseup", release);
-        document.addEventListener("touchend", release);
-        document.addEventListener("touchcancel", release);
-        document.addEventListener("mousemove", follow);
-        document.addEventListener("touchmove", follow);
-        document.body.addEventListener("mouseleave", release);
-        delay(10, () => self.classList.add("grabmotion"));
+        grabbed = true;
+        delay(10, () => grabmove = true);
         ongrab(card);
     }
 
     function release() {
-        document.removeEventListener("mouseup", release);
-        document.removeEventListener("touchend", release);
-        document.removeEventListener("touchcancel", release);
-        document.removeEventListener("mousemove", follow);
-        document.removeEventListener("touchmove", follow);
-        document.body.removeEventListener("mouseleave", release);
+
+        grabbed = false;
+        grabmove = false
 
         if (!self) return;
         self.style.transform = "";
-        self.classList.remove("grabbed");
-
-        self.classList.remove("grabmotion");
         onrelease(card);
     }
 
     // use function pointer switch to manage grability
-    let dograb = $derived(allowgrab ? grab : () => {});
-    let grabclass = $derived(allowgrab ? "cangrab" : "");
+    let dograb = $derived(allowgrab ? grab : undefined);
+    let dorelease = $derived(grabbed ? release : undefined);
+    let dofollow = $derived(grabbed ? follow : undefined);
+    let grabclass = $derived(
+        [
+            allowgrab ? "cangrab" : "",
+            grabbed ? "grabbed" : "",
+            grabmove ? "grabmotion" : ""
+        ].join(" ")
+    );
 
     function follow(event: MouseEvent | TouchEvent) {
         const ev = event instanceof MouseEvent ? event : event.touches[0];
         self.style.transform = `translateY(${ev.clientY - height / 2.0}px) translateX(${ev.clientX - width / 2.0}px)`;
     }
 </script>
+
+<svelte:document 
+    on:mouseup={dorelease}
+    on:touchend={dorelease}
+    on:touchcancel={dorelease}
+    on:mousemove={dofollow}
+    on:touchmove={dofollow}
+/>
+
+<svelte:body
+    on:mouseleave={dorelease}
+/>
 
 <div
     bind:this={self}
