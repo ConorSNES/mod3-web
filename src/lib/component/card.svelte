@@ -37,7 +37,7 @@
             onquickmove(card);
             return;
         }
-        if (event instanceof TouchEvent) event.preventDefault();
+        if (window.TouchEvent && event instanceof TouchEvent) event.preventDefault();
 
         follow(event);
         self.classList.add("grabbed");
