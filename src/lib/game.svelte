@@ -1,9 +1,9 @@
 <script lang="ts">
-    import maximize from "$lib/assets/iconkit/maximize.svg";
-    import minimize from "$lib/assets/iconkit/minimize.svg";
-    import config from "$lib/assets/iconkit/config.svg";
-    import tray from "$lib/assets/iconkit/tray.svg";
-    import create_new from "$lib/assets/iconkit/create_new.svg";
+    import maximize from "./assets/iconkit/maximize.svg";
+    import minimize from "./assets/iconkit/minimize.svg";
+    import config from "./assets/iconkit/config.svg";
+    import tray from "./assets/iconkit/tray.svg";
+    import create_new from "./assets/iconkit/create_new.svg";
     import Switch from "./component/generic/switch.svelte";
     import IconButton from "./component/generic/icon_button.svelte";
     import ManagedGameState from "./component/managed_game_state.svelte";
@@ -309,12 +309,14 @@
         flex-direction: column;
         margin: 0;
         padding: 0;
+        z-index: 1;
 
         box-sizing: border-box;
 
         :global(*) {
             font-family: "Noto Sans Mono", "Courier New", Courier, monospace;
             font-weight: 500;
+            color: #000;
         }
 
         header {
@@ -335,6 +337,7 @@
             }
 
             > span {
+                display: block;
                 white-space: nowrap;
                 text-align: center;
                 line-height: 32px;
@@ -356,18 +359,40 @@
             }
         }
 
-        &:global(.fullviewport) {
+        &.fullviewport {
             float: left;
-            position: fixed;
+            position: fixed !important;
             top: 0;
             left: 0;
             height: 100vh;
             width: 100vw;
         }
 
-        /* super arbitrary dark theme */
-        &:global(.dark) {
-            filter: invert();
+        /* 
+        super arbitrary dark theme, 
+        modified to be complicated later as for some reason setting a filter on an element's parent messes with fixed positioning. 
+        */
+        &.dark{
+            position: relative;
+
+            &::after {
+                mix-blend-mode: exclusion;
+                background-color: white;
+                outline: 2px solid white;
+
+                content: "";
+                display: block;
+                box-sizing: border-box;
+                z-index: 10000;
+
+                position: absolute;
+                width: 100%;
+                height: 100%;
+
+                user-select: none;
+                -webkit-user-select: none;
+                pointer-events: none;
+            }
         }
 
         #gamelayers {
@@ -386,7 +411,7 @@
                 place-content: center;
                 place-items: center;
 
-                overflow: auto;
+                overflow: hidden;
 
                 width: 100%;
                 height: 100%;

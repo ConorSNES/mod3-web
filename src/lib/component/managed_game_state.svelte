@@ -1,10 +1,10 @@
 <script lang="ts">
-    import GameState, { type StackState_Coord } from "$lib/gamestate";
+    import GameState, { type StackState_Coord } from "../gamestate";
     import ManagedStack from "./managed_stack.svelte";
-    import CardData from "$lib/card";
-    import deckstack from "$lib/assets/cards_2_deckstack.png";
-    import position from "$lib/assets/deck/position.png";
-    import { CardScale } from "$lib/cardscale";
+    import CardData from "../card";
+    import deckstack from "../assets/cards_2_deckstack.png";
+    import position from "../assets/deck/position.png";
+    import { CardScale } from "../cardscale";
     import { onDestroy, onMount } from "svelte";
 
     let height = $state(CardScale.height);

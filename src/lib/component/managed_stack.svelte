@@ -1,8 +1,8 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-explicit-any */
 
-    import type MetaCard from "$lib/card";
-    import Card from "$lib/component/card.svelte";
+    import type MetaCard from "../card";
+    import Card from "../component/card.svelte";
     import CardStack from "./card_stack.svelte";
 
     let {

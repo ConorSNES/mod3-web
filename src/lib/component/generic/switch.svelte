@@ -1,8 +1,8 @@
 <script lang="ts">
     /* Given how popular these things are, I probably don't need to explain it. Blockier aesthetic. */
 
-    import switch_on from "$lib/assets/switch/on_switch.svg";
-    import switch_off from "$lib/assets/switch/off_switch.svg";
+    import switch_on from "../../assets/switch/on_switch.svg";
+    import switch_off from "../../assets/switch/off_switch.svg";
 
     let { value = $bindable(false), fill = false }: { value: boolean, fill?: boolean} = $props();
 </script>

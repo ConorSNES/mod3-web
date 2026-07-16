@@ -16,3 +16,37 @@
 </Frame>
 
 <Game />
+
+<Frame>
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+    
+    <p>
+        Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling Long text to allow scrolling 
+    </p>
+</Frame>
