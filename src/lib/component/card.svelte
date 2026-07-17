@@ -1,18 +1,12 @@
 <script lang="ts">
+    import { getDimensions } from "$lib/cardscale";
+    import { getUserConfig } from "$lib/userconfig";
     import type Card from "../card";
     import card_to_image from "../card_to_image";
-    import { CardScale } from "../cardscale";
     import delay from "../generic/delay";
-    import { onDestroy, onMount } from "svelte";
 
-    let height = $state(CardScale.height);
-    let width = $state(CardScale.width);
-    function update_cardscale() {
-        height = CardScale.height;
-        width = CardScale.width;
-    }
-    onMount(() => CardScale.onMut.subscribe(update_cardscale));
-    onDestroy(() => CardScale.onMut.unsubscribe(update_cardscale));
+    const config = getUserConfig();
+    const [height, width] = $derived(getDimensions(config));
 
     let {
         card,
@@ -49,9 +43,8 @@
     }
 
     function release() {
-
         grabbed = false;
-        grabmove = false
+        grabmove = false;
 
         if (!self) return;
         self.style.transform = "";

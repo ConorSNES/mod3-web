@@ -4,17 +4,11 @@
     import CardData from "../card";
     import deckstack from "../assets/cards_2_deckstack.png";
     import position from "../assets/deck/position.png";
-    import { CardScale } from "../cardscale";
-    import { onDestroy, onMount } from "svelte";
+    import { getUserConfig } from "$lib/userconfig";
+    import { getDimensions } from "$lib/cardscale";
 
-    let height = $state(CardScale.height);
-    let width = $state(CardScale.width);
-    function update_cardscale() {
-        height = CardScale.height;
-        width = CardScale.width;
-    }
-    onMount(()=>CardScale.onMut.subscribe(update_cardscale));
-    onDestroy(()=>CardScale.onMut.unsubscribe(update_cardscale));
+    const config = getUserConfig();
+    const [height, width] = $derived(getDimensions(config));
 
     let {
         gamestate = $bindable(GameState.quick_start())

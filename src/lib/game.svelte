@@ -12,8 +12,8 @@
     import { BrowserStored } from "./generic/browser_stored";
     import { onMount } from "svelte";
     import DelayLoop from "./generic/delay_loop";
-    import { CardScale } from "./cardscale";
     import Range from "./component/generic/range.svelte";
+    import { setUserConfig } from "./userconfig";
 
     var self: HTMLElement;
 
@@ -41,12 +41,14 @@
         (v) => JSON.stringify(v),
     );
     let userconfig = $state(meta_userconfig.default_val);
-    onMount(()=>{userconfig = meta_userconfig.value});
+    onMount(()=>{
+        userconfig = meta_userconfig.value
+    });
     $effect(()=>{
         meta_userconfig.value = userconfig;
-        CardScale.scale = userconfig.card_scale;
+        setUserConfig(userconfig);
     });
-
+    
     // manage display state
 
     function doViewportReset() {

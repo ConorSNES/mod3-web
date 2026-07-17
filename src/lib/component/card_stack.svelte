@@ -1,15 +1,10 @@
 <script lang="ts">
-    import { CardScale } from "../cardscale";
-    import { onDestroy, onMount, type Snippet } from "svelte";
+    import { getUserConfig } from "$lib/userconfig";
+    import { getDimensions } from "../cardscale";
+    import { type Snippet } from "svelte";
 
-    let height = $state(CardScale.height);
-    let width = $state(CardScale.width);
-    function update_cardscale() {
-        height = CardScale.height;
-        width = CardScale.width;
-    }
-    onMount(() => CardScale.onMut.subscribe(update_cardscale));
-    onDestroy(() => CardScale.onMut.unsubscribe(update_cardscale));
+    const config = getUserConfig();
+    const [height, width] = $derived(getDimensions(config));
 
     let {
         children,

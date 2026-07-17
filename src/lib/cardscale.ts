@@ -1,19 +1,30 @@
-import Subscription from "./generic/subscription";
+import { type UserConfig } from "./userconfig";
 
-export class CardScale {
-    private static _scale = 0.8;
-    public static set scale(v : number) {
-        CardScale._scale = v;
-        CardScale.onMut.emit();
-    }
+const [img_height, img_width] = [154, 104];
 
-    public static get height() {
-        return 154 * CardScale._scale;
-    }
 
-    public static get width() {
-        return 104 * CardScale._scale;
-    }
-
-    public static readonly onMut = new Subscription();
+/**
+ * Function collecting card height, derived from user preferences on card scale.
+ */
+function getHeight(config : UserConfig) {
+    return img_height * config.card_scale;
 }
+
+/**
+ * Function collecting card width, derived from user preferences on card scale.
+ */
+function getWidth(config : UserConfig) {
+    return img_width * config.card_scale;
+}
+
+
+/**
+ * Combination of `getHeight()` and `getWidth()` for convenience.
+ * 
+ * @returns Scale of card in format `[height, width]`. 
+ */
+function getDimensions(config : UserConfig) : [number, number]  {
+    return [getHeight(config), getWidth(config)]
+}
+
+export { getHeight, getWidth, getDimensions };
