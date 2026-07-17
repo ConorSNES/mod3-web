@@ -167,7 +167,9 @@
             grid-row-start: 1;
             grid-row-end: 4;
 
-            padding-left: 16px;
+            margin-left: 16px;
+
+            background-image: url(../assets/generic/stripey.png);
         }
 
         .deck_placeholder,
@@ -176,7 +178,7 @@
             grid-row: 4;
 
             padding: 0;
-            padding-left: 16px;
+            margin-left: 16px;
         }
 
         .deck {

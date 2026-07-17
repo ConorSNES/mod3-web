@@ -293,7 +293,7 @@
     </article>
     {#if notification}
         <footer>
-            <span>{notification}</span>
+            {notification}
         </footer>
     {/if}
 </main>
