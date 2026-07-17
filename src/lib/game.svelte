@@ -165,6 +165,8 @@
     }
 </script>
 
+<svelte:document on:keydown={e => { if (e.key == "Escape") toggleOverlayRaised("about")}} />
+
 <main id="game" bind:this={self} class={(userconfig.dark_theme ? "dark" : "") + (displayState === 1 ? " fullviewport" : "")}>
     <header>
         {#if userconfig.show_timer}

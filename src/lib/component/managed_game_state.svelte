@@ -108,7 +108,7 @@
 
         {#if deck_count > 0}
             <button
-                class="deck"
+                id="deck"
                 title="Draw new cards from deck"
                 onclick={deal}
             >
@@ -169,7 +169,7 @@
         }
 
         .deck_placeholder,
-        .deck {
+        #deck {
             grid-column: 9;
             grid-row: 4;
 
@@ -177,7 +177,7 @@
             margin-left: 16px;
         }
 
-        .deck {
+        #deck {
             display: grid;
 
             height: fit-content;
