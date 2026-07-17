@@ -2,9 +2,8 @@
     import maximize from "./assets/iconkit/maximize.svg";
     import minimize from "./assets/iconkit/minimize.svg";
     import config from "./assets/iconkit/config.svg";
-    import tray from "./assets/iconkit/tray.svg";
     import create_new from "./assets/iconkit/create_new.svg";
-    import Switch from "./component/generic/switch.svelte";
+    import about from "./assets/iconkit/about.svg";
     import IconButton from "./component/generic/icon_button.svelte";
     import ManagedGameState from "./component/managed_game_state.svelte";
     import NoSsr from "./component/generic/no_ssr.svelte";
@@ -12,22 +11,23 @@
     import { BrowserStored } from "./generic/browser_stored";
     import { onMount } from "svelte";
     import DelayLoop from "./generic/delay_loop";
-    import Range from "./component/generic/range.svelte";
-    import { setUserConfig } from "./userconfig";
+    import Userconfig from "./component/game-frames/userconfig.svelte";
+    import { setUserConfig, type UserConfig } from "./userconfig";
+    import About from "./component/game-frames/about.svelte";
 
     var self: HTMLElement;
 
-    // manage config
-
-    let configRaised: boolean = $state(false);
-
-    interface UserConfig {
-        dark_theme: boolean;
-        show_timer: boolean;
-        show_movecount: boolean;
-        card_scale: number;
-        prefer_fullscreen: boolean;
+    // overlay management
+    type RaisedOverlay = "config" | "about" | null;
+    let overlayRaised = $state<RaisedOverlay>(null);
+    function toggleOverlayRaised(target : RaisedOverlay) {
+        overlayRaised = overlayRaised == target ? null : target
     }
+    function dismissOverlayRaised() {
+        overlayRaised = null;
+    }
+
+    // manage config
     const meta_userconfig = new BrowserStored<UserConfig>(
         "userconfig",
         {
@@ -41,10 +41,10 @@
         (v) => JSON.stringify(v),
     );
     let userconfig = $state(meta_userconfig.default_val);
-    onMount(()=>{
-        userconfig = meta_userconfig.value
+    onMount(() => {
+        userconfig = meta_userconfig.value;
     });
-    $effect(()=>{
+    $effect(() => {
         meta_userconfig.value = userconfig;
         setUserConfig(userconfig);
     });
@@ -192,11 +192,20 @@
             </span>
         {/if}
 
-        <span class="headerfill"></span>
+        <span class="headerfill subtle">
+            Mod3
+        </span>
 
         {#if wincount > 0}
             <span class="timer">Wins: {wincount}</span>
         {/if}
+
+        <IconButton 
+            src={about}
+            alt="about"
+            title="About"
+            onclick={() => (toggleOverlayRaised("about"))}
+        />
 
         <IconButton
             src={create_new}
@@ -209,7 +218,7 @@
             src={config}
             alt="config"
             title="Configure game options"
-            onclick={() => (configRaised = !configRaised)}
+            onclick={() => (toggleOverlayRaised("config"))}
         />
 
         {#if displayState == 0}
@@ -234,63 +243,11 @@
                 <ManagedGameState bind:gamestate />
             </NoSsr>
         </div>
-        <div id="config" hidden={!configRaised}>
-            <div>
-                <header>
-                    <span class="headerfill">Game Config</span>
-                    <IconButton
-                        src={tray}
-                        alt="minimise config menu"
-                        onclick={() => (configRaised = false)}
-                    />
-                </header>
-                <article>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Dark theme (invert colours)</td>
-                                <td>
-                                    <Switch
-                                        fill
-                                        bind:value={userconfig.dark_theme}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Show timer</td>
-                                <td>
-                                    <Switch
-                                        fill
-                                        bind:value={userconfig.show_timer}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Show move counter</td>
-                                <td>
-                                    <Switch
-                                        fill
-                                        bind:value={userconfig.show_movecount}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Card scale</td>
-                                <td>
-                                    <Range bind:value={userconfig.card_scale} min={0.1} max={2.0} step={0.1} label/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Prefer fullscreen when maximizing game</td>
-                                <td>
-                                    <Switch 
-                                        fill bind:value={userconfig.prefer_fullscreen}/>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </article>
-            </div>
+        <div class="overlay" hidden={!(overlayRaised === "config")}>
+            <Userconfig bind:userconfig onMinimize={dismissOverlayRaised}/>
+        </div>
+        <div class="overlay" hidden={!(overlayRaised === "about")}>
+            <About onNewGame={dismissOverlayRaised}/>
         </div>
     </article>
     {#if notification}
@@ -319,6 +276,10 @@
             font-family: "Noto Sans Mono", "Courier New", Courier, monospace;
             font-weight: 500;
             color: #000;
+        }
+
+        .subtle {
+            color: #0000008a;
         }
 
         header {
@@ -356,7 +317,6 @@
 
                 &.subtle {
                     font-style: italic;
-                    color: #0000008a;
                 }
             }
         }
@@ -418,50 +378,24 @@
                 width: 100%;
                 height: 100%;
             }
-        }
 
-        #config {
-            display: flex;
-            justify-content: center;
-            place-items: center;
+            > .overlay {
+                display: flex;
+                justify-content: center;
+                place-items: center;
 
-            padding: 16px;
-            box-sizing: border-box;
-            width: 100%;
-            height: 100%;
-            background: #00000080;
-            backdrop-filter: blur(4px);
+                padding: 16px;
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                background: #00000080;
+                backdrop-filter: blur(4px);
 
-            > * {
-                border: 2px solid black;
-                background: white;
+                
 
-                header > span {
-                    font-weight: 800;
+                &[hidden] {
+                    display: none;
                 }
-
-                article > table {
-                    border-spacing: 0;
-                    font-size: 12px;
-
-                    td {
-                        padding: 0;
-                        &:first-child {
-                            padding: 0 16px;
-                        }
-                        &:last-child {
-                            border-left: 2px solid black;
-                        }
-                    }
-
-                    tr:nth-child(even) {
-                        background: #eee;
-                    }
-                }
-            }
-
-            &[hidden] {
-                display: none;
             }
         }
 

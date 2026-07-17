@@ -16,7 +16,7 @@
 
 <div>
     {#if label} 
-    <span>{value}</span>
+    <input type="number" min={min} max={max} step={step} bind:value />
     {/if}
     <input type="range" bind:value min={min} max={max} step={step} />
 </div>
@@ -57,6 +57,7 @@
         -webkit-appearance: none;
         appearance: none;
         background: transparent;
+        border: none;
         cursor: pointer;
 
         &::-webkit-slider-runnable-track, &::-moz-range-track {
