@@ -2,7 +2,7 @@
     import { getDimensions } from "$lib/cardscale";
     import { getUserConfig } from "$lib/userconfig";
     import type Card from "../card";
-    import card_to_image from "../card_to_image";
+    import { card_to_image } from "../card_to_image";
     import delay from "../generic/delay";
 
     const config = getUserConfig();
@@ -22,7 +22,7 @@
         onrelease?: (v: Card) => void;
     } = $props();
 
-    let image = $derived(card_to_image(card));
+    const image = $derived(card_to_image(card, config));
 
     let self: HTMLDivElement;
 

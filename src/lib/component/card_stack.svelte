@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { card_position } from "$lib/card_to_image";
     import { getUserConfig } from "$lib/userconfig";
     import { getDimensions } from "../cardscale";
     import { type Snippet } from "svelte";
 
     const config = getUserConfig();
     const [height, width] = $derived(getDimensions(config));
+    const position = $derived(card_position(config));
 
     let {
         children,
@@ -17,7 +19,7 @@
     } = $props();
 </script>
 
-<div class="stack" style="--width: {width}px; --height: {height}px;">
+<div class="stack" style:--width={`${width}px`} style:--height={`${height}px`} style:--position-url={`url(${position})`}>
     {@render children?.()}
     <div
         class="topbox {allowdrop ? '' : 'hide'}"
@@ -37,7 +39,7 @@
         justify-content: space-between;
         align-items: start;
 
-        background: url("../assets/deck/position.png");
+        background: var(--position-url);
         background-repeat: no-repeat;
         background-size: var(--width) var(--height);
 

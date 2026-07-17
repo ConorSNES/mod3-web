@@ -114,7 +114,7 @@
                 padding: 0 16px;
             }
             &:last-child {
-                border-left: 2px solid black;
+                border-left: 2px solid #0003;
             }
         }
 

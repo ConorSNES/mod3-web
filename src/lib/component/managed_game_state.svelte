@@ -2,13 +2,15 @@
     import GameState, { type StackState_Coord } from "../gamestate";
     import ManagedStack from "./managed_stack.svelte";
     import CardData from "../card";
-    import deckstack from "../assets/deck/stack.png";
-    import position from "../assets/deck/position.png";
     import { getUserConfig } from "$lib/userconfig";
     import { getDimensions } from "$lib/cardscale";
+    import { card_position, card_stack } from "$lib/card_to_image";
 
     const config = getUserConfig();
     const [height, width] = $derived(getDimensions(config));
+    const deckstack = $derived(card_stack(config));
+    const position = $derived(card_position(config));
+
 
     let {
         gamestate = $bindable(GameState.quick_start())
