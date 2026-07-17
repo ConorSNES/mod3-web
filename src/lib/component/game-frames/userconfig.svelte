@@ -43,6 +43,12 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Show win counter</td>
+                    <td>
+                        <Switch fill bind:value={userconfig.show_wincount}/>
+                    </td>
+                </tr>
+                <tr>
                     <td>Card scale</td>
                     <td>
                         <Range
@@ -93,7 +99,7 @@
             line-height: 32px;
 
             width: 100%;
-            
+
             font-weight: 800;
         }
     }

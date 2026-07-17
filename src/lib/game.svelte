@@ -12,7 +12,7 @@
     import { onMount } from "svelte";
     import DelayLoop from "./generic/delay_loop";
     import Userconfig from "./component/game-frames/userconfig.svelte";
-    import { setUserConfig, type UserConfig } from "./userconfig";
+    import { default_userconfig, patch_userconfig, setUserConfig, type UserConfig } from "./userconfig";
     import About from "./component/game-frames/about.svelte";
 
     var self: HTMLElement;
@@ -30,14 +30,8 @@
     // manage config
     const meta_userconfig = new BrowserStored<UserConfig>(
         "userconfig",
-        {
-            dark_theme: false,
-            show_timer: true,
-            show_movecount: true,
-            card_scale: 0.8,
-            prefer_fullscreen: false,
-        },
-        (v) => (v ? JSON.parse(v) : v),
+        default_userconfig,
+        (v) => v ? (patch_userconfig(JSON.parse(v))) : null,
         (v) => JSON.stringify(v),
     );
     let userconfig = $state(meta_userconfig.default_val);
@@ -196,7 +190,7 @@
             Mod3
         </span>
 
-        {#if wincount > 0}
+        {#if userconfig.show_wincount && wincount > 0}
             <span class="timer">Wins: {wincount}</span>
         {/if}
 
@@ -247,7 +241,10 @@
             <Userconfig bind:userconfig onMinimize={dismissOverlayRaised}/>
         </div>
         <div class="overlay" hidden={!(overlayRaised === "about")}>
-            <About onNewGame={dismissOverlayRaised}/>
+            <About 
+                onNewGame={()=>{dismissOverlayRaised(); new_game();}}
+                onResumeGame={dismissOverlayRaised}
+            />
         </div>
     </article>
     {#if notification}

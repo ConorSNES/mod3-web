@@ -38,10 +38,12 @@
             </li>
         </ul>
 
-        <button onclick={onNewGame}> New Game </button>
-        {#if onResumeGame}
-            <button onclick={onResumeGame}> Resume Game </button>
-        {/if}
+        <div class="btngroup">
+            <button onclick={onNewGame}> New Game </button>
+            {#if onResumeGame}
+                <button onclick={onResumeGame}> Resume Game </button>
+            {/if}
+        </div>
     </article>
 </Frame>
 
@@ -78,6 +80,13 @@
             opacity: 30%;
         }
 
+        .btngroup {
+            display: flex;
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
         button {
             box-sizing: border-box;
             cursor: pointer;
@@ -94,6 +103,7 @@
 
             &:hover,
             &:focus {
+                padding-left: 16px;
                 background: #e2e2e2;
                 transition: none;
             }
