@@ -196,12 +196,14 @@
             <span class="timer">Wins: {wincount}</span>
         {/if}
 
-        <IconButton 
-            src={about}
-            alt="about"
-            title="About"
-            onclick={() => (toggleOverlayRaised("about"))}
-        />
+        {#if userconfig.show_aboutmenu}
+            <IconButton 
+                src={about}
+                alt="about"
+                title="About"
+                onclick={() => (toggleOverlayRaised("about"))}
+            />
+        {/if}
 
         <IconButton
             src={create_new}

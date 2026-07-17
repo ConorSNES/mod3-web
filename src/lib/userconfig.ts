@@ -7,6 +7,7 @@ interface UserConfig {
     show_timer: boolean;
     show_movecount: boolean;
     show_wincount: boolean;
+    show_aboutmenu: boolean;
 
     prefer_fullscreen: boolean;
 
@@ -20,6 +21,7 @@ export const default_userconfig = {
     show_timer: true,
     show_movecount: true,
     show_wincount: true,
+    show_aboutmenu: true,
     
     prefer_fullscreen: false,
 

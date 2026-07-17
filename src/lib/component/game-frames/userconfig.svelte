@@ -50,6 +50,12 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Show "about" button</td>
+                    <td>
+                        <Switch fill bind:value={userconfig.show_aboutmenu}/>
+                    </td>
+                </tr>
+                <tr>
                     <td>Prefer fullscreen when maximizing game</td>
                     <td>
                         <Switch
