@@ -2,7 +2,7 @@
     import GameState, { type StackState_Coord } from "../gamestate";
     import ManagedStack from "./managed_stack.svelte";
     import CardData from "../card";
-    import deckstack from "../assets/cards_2_deckstack.png";
+    import deckstack from "../assets/deck/stack.png";
     import position from "../assets/deck/position.png";
     import { getUserConfig } from "$lib/userconfig";
     import { getDimensions } from "$lib/cardscale";
