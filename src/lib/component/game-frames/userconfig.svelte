@@ -74,8 +74,9 @@
                     <td>Card style</td>
                     <td>
                         <select bind:value={userconfig.card_deck}>
-                            <option value={Deck_Style.minimal}>minimal</option>
-                            <option value={Deck_Style.two_tone}>two-tone</option>
+                            <option value={Deck_Style.minimal}>Minimal</option>
+                            <option value={Deck_Style.two_tone}>Two-tone</option>
+                            <option value={Deck_Style.four_colours}>Coloured Suits</option>
                         </select>
                     </td>
                 </tr>

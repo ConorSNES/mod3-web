@@ -1,6 +1,7 @@
 import type { UserConfig } from "./userconfig";
 import * as minimal from "./assets/decks/minimal/card_to_image";
 import * as twotone from "./assets/decks/twotone/card_to_image";
+import * as fourcolour from "./assets/decks/fourcolour/card_to_image";
 import type Card from "./card";
 
 export enum Deck_Style {
@@ -16,6 +17,8 @@ function deck_to_namespace(deck : Deck_Style) {
             return minimal;
         case Deck_Style.two_tone:
             return twotone;
+        case Deck_Style.four_colours:
+            return fourcolour;
         default:
             return minimal;
     }
