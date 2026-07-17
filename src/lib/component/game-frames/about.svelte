@@ -1,18 +1,21 @@
 <script lang="ts">
     import Frame from "../generic/frame.svelte";
 
-    const { 
+    import pck from "../../../../package.json";
+    const version = pck.version;
+
+    const {
         onNewGame = () => {},
         onResumeGame = null,
-    }: { 
-        onNewGame?: () => void,
-        onResumeGame?: (() => void ) | null
-        } = $props();
+    }: {
+        onNewGame?: () => void;
+        onResumeGame?: (() => void) | null;
+    } = $props();
 </script>
 
 <Frame pad={false}>
     <article id="info">
-        <h1>mod3-web</h1>
+        <h1>mod3-web <span class="dense-info">v{version}</span></h1>
         <p>Web-based implementation of Mod3 Solitaire ruleset.</p>
 
         <div class="fill"></div>
