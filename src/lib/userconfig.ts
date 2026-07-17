@@ -1,5 +1,5 @@
 import { createContext } from "svelte";
-import { Deck } from "./card_to_image";
+import { Deck_Style } from "./card_to_image";
 
 interface UserConfig {
     dark_theme: boolean;
@@ -11,7 +11,7 @@ interface UserConfig {
     prefer_fullscreen: boolean;
 
     card_scale: number;
-    card_deck: Deck;
+    card_deck: Deck_Style;
 }
 
 export const default_userconfig = {
@@ -24,7 +24,7 @@ export const default_userconfig = {
     prefer_fullscreen: false,
 
     card_scale: 0.8,
-    card_deck: Deck.minimal,
+    card_deck: Deck_Style.minimal,
 }
 
 export function patch_userconfig(uc : UserConfig) : UserConfig {

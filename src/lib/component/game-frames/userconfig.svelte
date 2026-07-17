@@ -5,6 +5,7 @@
     import tray from "../../assets/iconkit/tray.svg";
     import Switch from "../generic/switch.svelte";
     import Range from "../generic/range.svelte";
+    import { Deck_Style } from "$lib/card_to_image";
 
     const {
         onMinimize = () => {},
@@ -49,6 +50,15 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Prefer fullscreen when maximizing game</td>
+                    <td>
+                        <Switch
+                            fill
+                            bind:value={userconfig.prefer_fullscreen}
+                        />
+                    </td>
+                </tr>
+                <tr>
                     <td>Card scale</td>
                     <td>
                         <Range
@@ -61,12 +71,12 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Prefer fullscreen when maximizing game</td>
+                    <td>Card style</td>
                     <td>
-                        <Switch
-                            fill
-                            bind:value={userconfig.prefer_fullscreen}
-                        />
+                        <select bind:value={userconfig.card_deck}>
+                            <option value={Deck_Style.minimal}>minimal</option>
+                            <option value={Deck_Style.two_tone}>two-tone</option>
+                        </select>
                     </td>
                 </tr>
             </tbody>
@@ -121,5 +131,13 @@
         tr:nth-child(even) {
             background: #eee;
         }
+    }
+
+    select {
+        min-height: 24px;
+        width: 100%;
+        border: none;
+
+        cursor: pointer;
     }
 </style>
