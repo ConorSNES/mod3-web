@@ -389,13 +389,21 @@
                 box-sizing: border-box;
                 width: 100%;
                 height: 100%;
+
                 background: #00000080;
                 backdrop-filter: blur(4px);
-
-                
+                opacity: 1;
+                transition-property: opacity, backdrop-filter;
+                transition-duration: 100ms;
+                transition-timing-function: ease-out;
 
                 &[hidden] {
-                    display: none;
+                    user-select: none;
+                    -webkit-user-select: none;
+                    pointer-events: none;
+
+                    backdrop-filter: none;
+                    opacity: 0;
                 }
             }
         }
