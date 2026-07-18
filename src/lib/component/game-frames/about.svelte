@@ -7,9 +7,11 @@
     const {
         onNewGame = () => {},
         onResumeGame = null,
+        onHowToPlay = () => {},
     }: {
         onNewGame?: () => void;
         onResumeGame?: (() => void) | null;
+        onHowToPlay?: () => void;
     } = $props();
 </script>
 
@@ -46,6 +48,7 @@
             {#if onResumeGame}
                 <button onclick={onResumeGame}> Resume Game </button>
             {/if}
+            <button onclick={onHowToPlay}> How to Play</button>
         </div>
     </article>
 </Frame>

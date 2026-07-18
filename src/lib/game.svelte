@@ -14,11 +14,12 @@
     import Userconfig from "./component/game-frames/userconfig.svelte";
     import { default_userconfig, patch_userconfig, setUserConfig, type UserConfig } from "./userconfig";
     import About from "./component/game-frames/about.svelte";
+    import HowToPlay from "./component/game-frames/how_to_play.svelte";
 
     var self: HTMLElement;
 
     // overlay management
-    type RaisedOverlay = "config" | "about" | null;
+    type RaisedOverlay = "config" | "about" | "howto" | null;
     let overlayRaised = $state<RaisedOverlay>(null);
     function toggleOverlayRaised(target : RaisedOverlay) {
         overlayRaised = overlayRaised == target ? null : target
@@ -248,7 +249,11 @@
             <About 
                 onNewGame={()=>{dismissOverlayRaised(); new_game();}}
                 onResumeGame={dismissOverlayRaised}
+                onHowToPlay={()=>toggleOverlayRaised("howto")}
             />
+        </div>
+        <div class="overlay" hidden={!(overlayRaised === "howto")}>
+            <HowToPlay/>
         </div>
     </article>
     {#if notification}
