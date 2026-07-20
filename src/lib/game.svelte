@@ -253,8 +253,8 @@
             />
         </div>
         <div class="overlay" hidden={!(overlayRaised === "howto")}>
-            <HowToPlay/>
-        </div>
+            <HowToPlay onMinimize={dismissOverlayRaised} />
+        </div> 
     </article>
     {#if notification}
         <footer>

@@ -13,7 +13,9 @@
 </script>
 
 {#snippet slide1()}
-    <figure></figure>
+    <figure>
+        <enhanced:img src="../../assets/howto_thumbs/basegame.png" alt="initial game state" />
+    </figure>
     <p>
         Mod3 solitaire is a singleplayer game played with two decks of cards. 
         The main objective is to sort the cards into 24 piles under specific logic.
@@ -115,6 +117,16 @@
 
         b {
             font-weight: 900;
+        }
+
+        figure {
+            width: 100%;
+            height: 256px;
+            overflow: hidden;
+
+            >* {
+                
+            }
         }
     }
 
