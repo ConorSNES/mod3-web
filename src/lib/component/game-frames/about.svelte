@@ -1,8 +1,7 @@
 <script lang="ts">
     import Frame from "../generic/frame.svelte";
 
-    import pck from "../../../../package.json";
-    const version = pck.version;
+    const version = "0.2.0";
 
     const {
         onNewGame = () => {},
