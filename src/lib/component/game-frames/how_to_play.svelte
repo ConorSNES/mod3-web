@@ -7,18 +7,24 @@
     import tray from "../../assets/iconkit/tray.svg";
 
     let slide = $state(0);
-    const slides = [slide1, slide2, slide3, slide4];
+    const slides = [slide1, slide2, slide3, slide4, slide5, hintstips];
 
     let { onMinimize = () => {} }: { onMinimize?: () => void } = $props();
 </script>
 
 {#snippet slide1()}
     <figure>
-        <enhanced:img src="../../assets/howto_thumbs/basegame.png" alt="initial game state" />
+        <enhanced:img
+            class="imgfix"
+            src="../../assets/howto_thumbs/basegame.png"
+            alt="...initial game state"
+            height="300"
+        />
     </figure>
     <p>
-        Mod3 solitaire is a singleplayer game played with two decks of cards. 
-        The main objective is to sort the cards into 24 piles under specific logic.
+        Mod3 solitaire is a singleplayer game played with two decks of cards.
+        The main objective is to sort the cards into 24 piles under specific
+        logic.
     </p>
     <p>
         At the start of the game, <b>all 32 cells are filled with one card</b> each.
@@ -26,25 +32,98 @@
 {/snippet}
 
 {#snippet slide2()}
+    <figure>
+        <enhanced:img
+            src="../../assets/howto_thumbs/acesmove.png"
+            alt="...aces move instantly"
+            height="300"
+        />
+    </figure>
     <p>
-        Aces are always <b>moved to the Ace pile instantly</b>. 
+        Aces are always <b>moved to the Ace pile instantly</b>.
     </p>
 {/snippet}
 
 {#snippet slide3()}
+    <figure>
+        <enhanced:img
+            src="../../assets/howto_thumbs/replenishingstacks.png"
+            alt="...bottom stack slots are replenished by deck"
+            height="300"
+        />
+    </figure>
     <p>
-        Any <b>empty cells</b> on the <b>bottom row</b> are <b>refilled with one card from the deck instantly</b>.
+        Any <b>empty cells</b> on the <b>bottom row</b> are
+        <b>refilled with one card from the deck instantly</b>, if possible.
     </p>
-    <p>
-        If the deck is empty, you can use them for anything.
-    </p>
+    <p>Otherwise, they can be used as free cells.</p>
 {/snippet}
 
 {#snippet slide4()}
-    <caption>forgo</caption>
+    <figure>
+        <enhanced:img
+            src="../../assets/howto_thumbs/stackorder.png"
+            alt="...stack ordering"
+            height="300"
+        />
+    </figure>
+    <p>
+        Each row (besides the bottom row) has a specific ascending order in
+        which you stack the cards.
+    </p>
+    <p>
+        <b
+            >The first row is stacked 2-5-8-J, the second row 3-6-9-Q, the third
+            4-7-10-K.</b
+        >
+    </p>
+    <p>
+        <b>Stacks may only be made with cards of the same suit</b> and
+        <b>cards in a valid position cannot be moved</b>.
+    </p>
 {/snippet}
 
-<Frame pad={false}>
+{#snippet slide5()}
+    <figure>
+        <enhanced:img
+            src="../../assets/howto_thumbs/deckdeal.png"
+            alt="...bottom row"
+            height="300"
+        />
+    </figure>
+    <p>
+        Clicking the deck while it has cards will deal one to every stack on the
+        bottom row, from left to right.
+    </p>
+    <p>
+        You can move surface-level cards from the bottom row, as well as any not
+        already in a valid position on the three sorted rows.
+    </p>
+{/snippet}
+
+{#snippet hintstips()}
+    <h1 class="hintstips">Hints and tips:</h1>
+    <p>
+        The game should save automatically to your browser, however clearing
+        cache or switching devices may cause you to lose your preferences.
+    </p>
+    <p>
+        You can remove elements such as the timer and move counter in the
+        settings menu, as well as the size of the cards.
+    </p>
+    <p>
+        If it is hard to make out the different card suits, try the setting
+        labeled "Card Style" in the settings menu. The "Coloured suits" option
+        should provide the best contrast, but may look stange when dark theme is
+        enabled.
+    </p>
+    <p>
+        For keyboard/mouse users: Shift-clicking a card will "quick-move" it.
+        Shift-clicking the maximise button will full screen the game.
+    </p>
+{/snippet}
+
+<Frame pad={false} style="min-height:80%; width:80%;">
     <header>
         <span class="headerfill">How to Play</span>
         <IconButton
@@ -107,12 +186,22 @@
 
 <style>
     article#howto {
+        display: flex;
+        flex-direction: column;
+
+        gap: 16px;
+
         padding: 16px;
-        width: 50vw;
+        min-width: 50vw;
+        height: 100%;
+        box-sizing: border-box;
+
+        overflow-y: auto;
+        overflow-x: hidden;
 
         * {
             font-weight: 400;
-            margin: none;
+            margin: 0;
         }
 
         b {
@@ -120,13 +209,34 @@
         }
 
         figure {
+            min-width: fit-content;
             width: 100%;
-            height: 256px;
+            height: fit-content;
+            box-sizing: border-box;
             overflow: hidden;
 
-            >* {
-                
+            display: flex;
+            place-items: center;
+            place-content: center;
+            flex-shrink: 0;
+
+            border: 2px solid black;
+
+            * {
+                height: fit-content;
+                box-sizing: border-box;
+                display: block;
             }
+        }
+
+        .hintstips {
+            font-size: 24px;
+            font-weight: 900;
+            color: white;
+            width: 100%;
+            padding: 4px;
+            text-align: center;
+            background-color: black;
         }
     }
 
@@ -162,7 +272,7 @@
             &.filled {
                 background-color: black;
             }
- 
+
             &[disabled] {
                 background-color: #4e4e4e;
                 cursor: default;

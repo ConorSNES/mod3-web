@@ -324,6 +324,10 @@
                 &.subtle {
                     font-style: italic;
                 }
+
+                @media (width < 560px) {
+                    display: none;
+                }
             }
         }
 
@@ -387,6 +391,7 @@
 
             > .overlay {
                 display: flex;
+                flex-direction: column;
                 justify-content: center;
                 place-items: center;
 
@@ -394,6 +399,8 @@
                 box-sizing: border-box;
                 width: 100%;
                 height: 100%;
+
+                overflow: hidden;
 
                 background: #00000080;
                 backdrop-filter: blur(4px);

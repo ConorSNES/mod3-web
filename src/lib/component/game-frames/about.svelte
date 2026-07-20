@@ -17,7 +17,7 @@
 
 <Frame pad={false}>
     <article id="info">
-        <h1>mod3-web <span class="dense-info">v{version}</span></h1>
+        <h1>mod3-web <span class="version">v{version}</span></h1>
         <p>Web-based implementation of Mod3 Solitaire ruleset.</p>
 
         <div class="fill"></div>
@@ -65,6 +65,9 @@
 
         .fill {
             height: 128px;
+            @media (height < 600px) {
+                height:100%;
+            }
         }
 
         * {
@@ -84,6 +87,19 @@
             padding-left: 8px;
             font-size: 11px;
             opacity: 30%;
+
+            @media (height < 600px) {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 2px 20px;
+                padding-left: 0;
+            }
+        }
+
+        .version {
+            font-size: 11px;
+            opacity: 30%;
         }
 
         .btngroup {
@@ -91,6 +107,17 @@
             flex-direction: column;
 
             gap: 8px;
+
+            @media (height < 600px) {
+                display: grid;
+                column-count: 2;
+                grid-auto-flow: dense;
+                grid-template-columns: auto;
+
+                >:nth-child(even) {
+                    grid-column: 2;
+                }
+            }
         }
 
         button {

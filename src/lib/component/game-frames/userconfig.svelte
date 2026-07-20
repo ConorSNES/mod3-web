@@ -121,6 +121,10 @@
         }
     }
 
+    article {
+        overflow-y: auto;
+    }
+
     article > table {
         border-spacing: 0;
         font-size: 12px;
