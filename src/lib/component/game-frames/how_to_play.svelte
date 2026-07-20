@@ -15,10 +15,8 @@
 {#snippet slide1()}
     <figure>
         <enhanced:img
-            class="imgfix"
             src="../../assets/howto_thumbs/basegame.png"
             alt="...initial game state"
-            height="300"
         />
     </figure>
     <p>
@@ -36,7 +34,6 @@
         <enhanced:img
             src="../../assets/howto_thumbs/acesmove.png"
             alt="...aces move instantly"
-            height="300"
         />
     </figure>
     <p>
@@ -49,7 +46,6 @@
         <enhanced:img
             src="../../assets/howto_thumbs/replenishingstacks.png"
             alt="...bottom stack slots are replenished by deck"
-            height="300"
         />
     </figure>
     <p>
@@ -64,7 +60,6 @@
         <enhanced:img
             src="../../assets/howto_thumbs/stackorder.png"
             alt="...stack ordering"
-            height="300"
         />
     </figure>
     <p>
@@ -88,7 +83,6 @@
         <enhanced:img
             src="../../assets/howto_thumbs/deckdeal.png"
             alt="...bottom row"
-            height="300"
         />
     </figure>
     <p>
@@ -211,7 +205,7 @@
         figure {
             min-width: fit-content;
             width: 100%;
-            height: fit-content;
+            height: 50vh;
             box-sizing: border-box;
             overflow: hidden;
 
@@ -223,9 +217,13 @@
             border: 2px solid black;
 
             * {
-                height: fit-content;
                 box-sizing: border-box;
                 display: block;
+            }
+
+            :global(img) {
+                height: 50vh;
+                width: auto;
             }
         }
 
@@ -237,6 +235,7 @@
             padding: 4px;
             text-align: center;
             background-color: black;
+            box-sizing: border-box;
         }
     }
 
